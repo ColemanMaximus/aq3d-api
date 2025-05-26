@@ -1,5 +1,10 @@
-import aq3d_api.servers as servers
+import requests
+from aq3d_api.servers import Server
 
-server = servers.Server(1, "Red Dragon")
-server.access_level = 100
-server.max_players = 5000
+servers_api_url = "https://game.aq3d.com/api/game/GetServerList"
+
+def get_servers(url: str) -> list:
+    json_res = requests.get(url).json()
+    return [Server.create_raw(server) for server in json_res["Servers"]]
+
+servers = get_servers(servers_api_url)

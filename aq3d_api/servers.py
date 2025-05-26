@@ -8,21 +8,36 @@ class Server:
                  name: str,
                  region: str = "NA",
                  language: str = "en",
-                 access_level: int = 0):
+                 players: int = 0,
+                 max_players: int = 0,
+                 hostname: str = "",
+                 port: int = 0,
+                 access_level: int = 0,
+                 status: int = 0):
         """
+
         :param id: ID of the server.
         :param name: The servers name.
+        :param region: Region areacode for the server.
+        :param language: Language of the server.
+        :param players: How many players are online.
+        :param max_players: The maximum amount of players this server can hold.
+        :param hostname: The hostname the server operates on.
+        :param port: The port number the server listens to.
+        :param access_level: The access or permission level for the server.
+        :param status: The server uptime indicator, 1 meaning online.
         """
 
         self.id = id
         self.name = name
         self.region = region
         self.language = language
-        self.players = 0
-        self.max_players = 0
-        self.hostname = ""
-        self.port = 0
+        self.players = players
+        self.max_players = max_players
+        self.hostname = hostname
+        self.port = port
         self.access_level = access_level
+        self.status = status
 
     @property
     def id(self) -> int:
@@ -228,6 +243,24 @@ class Server:
         self.__access_level = access_level
 
     @property
+    def status(self) -> int:
+        return self.__status
+
+    @status.setter
+    def status(self, status: int):
+        """
+        Sets the status for the server, which acts as an
+        uptime indicator, 0 is offline, 1 is online.
+
+        :param status: The status which can either be 0 or 1.
+        """
+
+        if not isinstance(status, int) or not 0 <= status <= 1:
+            raise ValueError("Expected an integer for server status between 0 and 1.")
+
+        self.__status = status
+
+    @property
     def is_full(self) -> bool:
         """
         Returns a bool depending on if the server has reached
@@ -237,3 +270,29 @@ class Server:
         """
 
         return self.players >= self.max_players
+
+    @property
+    def is_online(self) -> bool:
+        """
+        Returns a bool based on if the server is online or offline based
+        on the servers status code.
+
+        :return: Returns bool based on server status.
+        """
+
+        return bool(self.status)
+
+    @classmethod
+    def create_raw(cls, raw):
+        return cls(
+            id = raw.get("ID"),
+            name = raw.get("Name"),
+            region = raw.get("Region", "NA"),
+            language = raw.get("Language", "en"),
+            players = raw.get("UserCount", 0),
+            max_players = raw.get("MaxUsers", 0),
+            hostname = raw.get("HostName"),
+            port = raw.get("Port", 0),
+            access_level = raw.get("AccessLevel", 0),
+            status = raw.get("Status", 0)
+        )

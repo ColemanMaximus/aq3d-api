@@ -1,3 +1,6 @@
+from time import time
+from datetime import datetime
+
 """ This module contains classes and functions for capturing server metadata."""
 
 class Server:
@@ -13,7 +16,9 @@ class Server:
                  hostname: str = "",
                  port: int = 0,
                  access_level: int = 0,
-                 status: int = 0):
+                 status: int = 0,
+                 last_updated: float = -1
+                 ):
         """
 
         :param id: ID of the server.
@@ -38,6 +43,7 @@ class Server:
         self.port = port
         self.access_level = access_level
         self.status = status
+        self.last_updated = last_updated
 
     @property
     def id(self) -> int:
@@ -266,6 +272,32 @@ class Server:
         self.__status = status
 
     @property
+    def last_updated(self) -> float:
+        """
+        Returns a timestamp of the last time the server
+        data was refreshed.
+
+        :return float: Timestamp of the last time the server was refreshed.
+        """
+
+        return self.__last_updated
+
+    @last_updated.setter
+    def last_updated(self, timestamp: float | int):
+        """
+        Sets the last update to a timestamp based on
+        seconds since epoch.
+
+        :param timestamp: The timestamp of the last time the server
+        data was refreshed.
+        """
+
+        if not isinstance(timestamp, (float, int)):
+            raise ValueError("Expected a timestamp of either a float or integer value.")
+
+        self.__last_updated = timestamp
+
+    @property
     def is_full(self) -> bool:
         """
         Returns a bool depending on if the server has reached
@@ -308,7 +340,10 @@ class Server:
             hostname = raw.get("HostName"),
             port = raw.get("Port", 0),
             access_level = raw.get("AccessLevel", 0),
-            status = raw.get("Status", 0)
+            status = raw.get("Status", 0),
+            last_updated = datetime.strptime(
+                raw.get("LastUpdated", ""), "%Y-%m-%dT%H:%M:%S"
+            ).timestamp()
         )
 
     def __str__(self) -> str:

@@ -522,6 +522,20 @@ class Servers:
 
         return self.sorted_servers(online=True)[0]
 
+    def create_snapshots(self, online_only: bool = True) -> tuple:
+        """
+        Generates a snapshot of each server assigned to this instance.
+
+        :param online_only: Whether to only snapshot online servers or both.
+        :return: Tuple of sever snapshots.
+        """
+
+        snapshots = tuple(
+            [ServerSnapshot(server)
+                for server in self.sorted_servers(online=online_only)]
+        )
+        return snapshots
+
     @property
     def __needs_updating(self) -> bool:
         if (time() - self.__last_updated) < self.__update_interval:

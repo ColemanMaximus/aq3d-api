@@ -74,6 +74,11 @@ class Server:
         if not isinstance(name, str) or not name.strip():
             raise ValueError("None/invalid name was provided for the server.")
 
+        # Some server names have the regions areacode attached to the name,
+        # this will filter them so only the name itself is used.
+        if "[" in name:
+            name = name.split("[")[0].strip()
+
         self.__name = name
 
     @property
@@ -284,6 +289,15 @@ class Server:
 
     @classmethod
     def create_raw(cls, raw):
+        """
+        Factory method to return a Server object based on raw json
+        structured as if it were from the official AQ3D API endpoint.
+
+        :param raw: Expects raw json based on the structure of the servers AQ3D API.
+        :return Server: Returns a Server object based on the raw json data.
+
+        """
+
         return cls(
             id = raw.get("ID"),
             name = raw.get("Name"),
@@ -296,3 +310,9 @@ class Server:
             access_level = raw.get("AccessLevel", 0),
             status = raw.get("Status", 0)
         )
+
+    def __str__(self) -> str:
+        online_status = f"{"Online" if self.is_online else "Offline"}"
+        players = f"{self.players}/{self.max_players}"
+
+        return f"{self.name} ({online_status}) -> {players}"

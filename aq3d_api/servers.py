@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from datetime import datetime
 from enum import Enum
 
@@ -383,7 +384,83 @@ class Server:
 
         return f"{self.name} ({online_status}) -> {players}"
 
+
+class Servers:
+    """ A class bundle of related servers, and useful methods. """
+
+    def __init__(self, servers: list[Server] = None):
+        """
+        
+        :param servers: Any Server objects to be added at initialization.
+        """
+
+        self.servers = servers
+
+    @property
+    def servers(self) -> tuple:
+        """
+        Returns all servers within this Servers instance.
+        
+        :return tuple: A tuple of server objects.
+        """
+        
+        return tuple(self.__servers)
+
+    @servers.setter
+    def servers(self, servers: Sequence[Server]):
+        """
+        Sets the servers attribute to an initial sequence of servers.
+
+        :param servers: The servers to add to this Servers instance.
+        """
+
+        self.__servers = [
+            server for server in servers if isinstance(server, Server)
+        ]
+
+    def add(self, server: Server):
+        """
+        Adds a Server object into the Servers instance.
+
+        :param server: The Server object to add into the Servers container.
+        """
+
+        if not isinstance(server, Server):
+            raise ValueError(f"Expected a Server object but instead received {type(server)}.")
+
+        self.__servers.append(server)
+
+    @property
+    def players(self) -> int:
+        """
+        Returns the number of online players across all servers.
+
+        :return int: The number of online players.
+        """
+
+        if not self.servers:
+            return 0
+
+        return sum([server.players for server in self.servers])
+
+    def __getitem__(self, index: int):
+        if not isinstance(index, int):
+            raise ValueError("Expected an index of the server.")
+
+        return self.__servers[index]
+
+    def __iter__(self) -> iter:
+        return iter(self.servers)
+
+
 def _statuscode_to_status(statuscode: int) -> ServerStatus:
+    """
+    Returns the ServerStatus representation of an integer status code.
+
+    :param statuscode: An integer of the status code, 0 or 1.
+    :return: Returns a ServerStatus representation of the status code.
+    """
+
     if statuscode == 0:
         return ServerStatus.OFFLINE
 

@@ -7,7 +7,7 @@ from time import time
 from enum import Enum
 from json import JSONDecodeError
 
-from aq3d_api.snapshots import Snapshot
+from aq3d_api.snapshots import ServerSnapshot
 
 
 class ServerStatus(Enum):
@@ -21,42 +21,13 @@ class ServerStatus(Enum):
     OFFLINE = "0"
 
 
-class ServerSnapshot(Snapshot):
-    """
-    Captures a snapshot of a Server instance.
-
-    Useful for snapshot logging to external databases.
-    """
-
-    def __init__(self, server):
-        """
-        :param server: The server in which the snapshot should target.
-        """
-
-        if not isinstance(server, Server):
-            raise ValueError("Was expecting an instance of Server for the snapshots.")
-
-        super().__init__(server)
-
-    @property
-    def server_data(self) -> dict:
-        """
-        Returns a dict representation of a Server object structure.
-        Access data using scriptable keys.
-
-        :return: Returns a dict of server metadata.
-        """
-
-        return self._dict
-
-
 class Server:
     """ Metadata about a server is bundled up into this Server class. """
 
     maintenance_buffer = 10
 
     def __init__(self,
-                 id: int,
+                 sid: int,
                  name: str,
                  region: str = "NA",
                  language: str = "en",
@@ -70,7 +41,7 @@ class Server:
                  ):
         """
 
-        :param id: ID of the server.
+        :param sid: ID of the server.
         :param name: The servers name.
         :param region: Region areacode for the server.
         :param language: Language of the server.
@@ -82,7 +53,7 @@ class Server:
         :param status: The server uptime indicator, ONLINE, OFFLINE AND MAINTENANCE.
         """
 
-        self.id = id
+        self.id = sid
         self.name = name
         self.region = region
         self.language = language
@@ -99,11 +70,11 @@ class Server:
         return self.__id
 
     @id.setter
-    def id(self, id: int):
-        if not id or not isinstance(id, int):
+    def id(self, sid: int):
+        if not sid or not isinstance(sid, int):
             raise ValueError("Invalid id for the server was provided.")
 
-        self.__id = id
+        self.__id = sid
 
     @property
     def name(self) -> str:
@@ -398,7 +369,7 @@ class Server:
         """
 
         return cls(
-            id = raw.get("ID"),
+            sid = raw.get("ID"),
             name = raw.get("Name"),
             region = raw.get("Region", "NA"),
             language = raw.get("Language", "en"),

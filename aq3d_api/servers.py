@@ -1,9 +1,14 @@
 """ This module contains classes and functions for capturing server metadata."""
 
 class Server:
-    """ Metadata about a server is bundled up in this Server class. """
+    """ Metadata about a server is bundled up into this Server class. """
 
-    def __init__(self, id: int, name: str):
+    def __init__(self,
+                 id: int,
+                 name: str,
+                 region: str = "NA",
+                 language: str = "en",
+                 access_level: int = 0):
         """
         :param id: ID of the server.
         :param name: The servers name.
@@ -11,8 +16,13 @@ class Server:
 
         self.id = id
         self.name = name
+        self.region = region
+        self.language = language
         self.players = 0
         self.max_players = 0
+        self.hostname = ""
+        self.port = 0
+        self.access_level = access_level
 
     @property
     def id(self) -> int:
@@ -40,7 +50,8 @@ class Server:
         """
         Sets the name of the server.
 
-        Server names can't be an empty value, they require a valid non-empty string.
+        Server names can't be an empty value, they require
+        a valid non-empty string.
 
         :param name: The name the server should have.
         """
@@ -49,6 +60,55 @@ class Server:
             raise ValueError("None/invalid name was provided for the server.")
 
         self.__name = name
+
+    @property
+    def region(self) -> str:
+        """
+        Returns an areacode for the region in which the server
+        is based in.
+
+        :return str: Areacode for the region.
+        """
+
+        return self.__region
+
+    @region.setter
+    def region(self, region: str):
+        """
+        Sets the regions areacode for the server. Such as NA, SEA, EU...
+
+        :param region: The regions areacode.
+        """
+
+        if not isinstance(region, str):
+            raise ValueError(
+                "Expected a string region areacode for the servers region."
+            )
+
+        self.__region = region.upper()
+
+    @property
+    def language(self) -> str:
+        """
+        Returns the language of the server.
+
+        :return str: The language of the server.
+        """
+
+        return self.__language
+
+    @language.setter
+    def language(self, lang):
+        """
+        Sets the language of the server, such as en.
+
+        :param lang: The language the server targets.
+        """
+
+        if not isinstance(lang, str):
+            raise ValueError("Expected a string for servers language.")
+
+        self.__language = lang
 
     @property
     def players(self) -> int:
@@ -76,7 +136,8 @@ class Server:
     @property
     def max_players(self) -> int:
         """
-        Returns the maximum amount of players allowed on the server at once.
+        Returns the maximum amount of players allowed on
+        the server at once.
 
         :return int: Returns the maximum amount of players.
         """
@@ -91,9 +152,86 @@ class Server:
         self.__max_players = value
 
     @property
+    def hostname(self) -> str:
+        """
+        Returns the hostname which the server is using.
+
+        :return: Servers hostname.
+        """
+
+        return self.__hostname
+
+    @hostname.setter
+    def hostname(self, hostname: str):
+        """
+        Sets the servers hostname to the one it's operating on.
+
+        :param hostname: The hostname of the server.
+        """
+
+        if not isinstance(hostname, str):
+            raise ValueError("Expected a string for the servers hostname.")
+
+        self.__hostname = hostname
+
+    @property
+    def port(self) -> int:
+        """
+        Returns the servers port number which it's listening to.
+
+        :return int: Servers port number.
+        """
+
+        return self.__port
+
+    @port.setter
+    def port(self, port: int):
+        """
+        Sets the port number which the server will operate on
+        between 0 and 65535.
+
+
+        :param port: THe port the server should listen on.
+        """
+
+        if not isinstance(port, int):
+            raise ValueError("Expected an integer for the port number.")
+
+        if not 0 <= port <= 65535:
+            raise ValueError("Ports can only be between 0 and 65535.")
+
+        self.__port = port
+
+    @property
+    def access_level(self) -> int:
+        """
+        Returns the access level of the server, which is a kind of
+        permission level. 0 being player access, 100 admin access only.
+
+        :return int: The access level as an integer.
+        """
+
+        return self.__access_level
+
+    @access_level.setter
+    def access_level(self, access_level: int):
+        """
+        Sets the access level for the server, which defines a permission
+        access level.
+
+        :param access_level: The access level in which the server holds.
+        """
+
+        if not isinstance(access_level, int):
+            raise ValueError("Expected an integer for access level.")
+
+        self.__access_level = access_level
+
+    @property
     def is_full(self) -> bool:
         """
-        Returns a bool depending on if the server has reached or exceeded its player limit.
+        Returns a bool depending on if the server has reached
+        or exceeded its player limit.
 
         :return bool: Returns bool based on player limits.
         """

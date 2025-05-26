@@ -418,6 +418,17 @@ class Servers:
             server for server in servers if isinstance(server, Server)
         ]
 
+    @property
+    def online_servers(self) -> tuple:
+        """
+        Gets all servers are on online, filtering offline
+        and maintenance servers.
+
+        :return tuple: Returns a tuple of online servers.
+        """
+
+        return tuple(server for server in self.servers if server.is_online)
+
     def add(self, server: Server):
         """
         Adds a Server object into the Servers instance.
@@ -451,6 +462,13 @@ class Servers:
 
     def __iter__(self) -> iter:
         return iter(self.servers)
+
+    def __str__(self):
+        response = f"Servers ({len(self.servers)}): Players -> {self.players}"
+        for server in self.servers:
+            response += f"\n  - {server}"
+
+        return response
 
 
 def _statuscode_to_status(statuscode: int) -> ServerStatus:

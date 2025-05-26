@@ -1,4 +1,4 @@
-from aq3d_api.servers import Servers
+from aq3d_api.servers.containers import Servers
 
 
 def get_servers() -> Servers:
@@ -11,3 +11,4 @@ servers = get_servers()
 
 # Creating a snapshot of the servers current data.
 server_snaps = servers.create_snapshots()
+print(servers)

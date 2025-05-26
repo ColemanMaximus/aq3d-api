@@ -1,40 +1,9 @@
-"""
-This module handles working with Item objects
-and some useful methods to operate on them.
-"""
-
 import aq3d_api.utils as utils
-from aq3d_api.enums import ItemType, ItemRarity, ItemEquipType
 
-
-class ItemAttributes:
-    """
-    A class for item attributes, including stats such as
-    health, attack, armor, evasion and critical.
-    """
-
-    def __init__(self,
-                 health: float = 0,
-                 attack: float = 0,
-                 armor: float = 0,
-                 evasion: float = 0,
-                 critical: float = 0):
-
-        """
-
-        :param health: Health the item gives.
-        :param attack: Attack the item gives.
-        :param armor: Armor the item gives.
-        :param evasion: Health the item gives.
-        :param critical: Critical damage the item gives.
-        """
-
-        self.health = health
-        self.attack = attack
-        self.armor = armor
-        self.evasion = evasion
-        self.critical = critical
-
+from aq3d_api.items.attributes import ItemAttributes
+from aq3d_api.enums.item_type import ItemType
+from aq3d_api.enums.item_equip_type import ItemEquipType
+from aq3d_api.enums.item_rarity import ItemRarity
 
 class Item(ItemAttributes):
     """ The Item class defines an item object. """
@@ -57,7 +26,7 @@ class Item(ItemAttributes):
                  critical: float = 0,
                  is_cosmetic: bool = False,
                  is_dc_purchasable: bool = False
-                ):
+                 ):
 
         """
 
@@ -321,7 +290,7 @@ class Item(ItemAttributes):
 
         :param value: A bool based on if the item is cosmetic.
         """
-        
+
         if not isinstance(value, bool):
             raise ValueError("Expected a bool value for the cosmetic property setter.")
 
@@ -363,28 +332,28 @@ class Item(ItemAttributes):
         """
 
         return cls(
-            item_id = raw.get("ID"),
-            name = raw.get("Name"),
-            description = raw.get("Desc", ""),
-            price = raw.get("Cost", 0),
-            item_type = utils.to_enum(
+            item_id=raw.get("ID"),
+            name=raw.get("Name"),
+            description=raw.get("Desc", ""),
+            price=raw.get("Cost", 0),
+            item_type=utils.to_enum(
                 ItemType, raw.get("Type", 0), ItemType.NONE
             ),
-            equip_type = utils.to_enum(
+            equip_type=utils.to_enum(
                 ItemEquipType, raw.get("EquipSlot", 0), ItemEquipType.NONE
             ),
-            rarity = utils.to_enum(
+            rarity=utils.to_enum(
                 ItemRarity, raw.get("Rarity", 0), ItemRarity.JUNK
             ),
-            stack_size = raw.get("MaxStack", 1),
-            version = raw.get("bundle")["Version"] if "bundle" in raw else 1,
-            health = raw.get("MaxHealth", 0),
-            attack = raw.get("Attack", 0),
-            armor = raw.get("Armor", 0),
-            evasion = raw.get("Evasion", 0),
-            critical = raw.get("Crit", 0),
-            is_cosmetic = raw.get("IsCosmetic", False),
-            is_dc_purchasable = raw.get("IsMC", False)
+            stack_size=raw.get("MaxStack", 1),
+            version=raw.get("bundle")["Version"] if "bundle" in raw else 1,
+            health=raw.get("MaxHealth", 0),
+            attack=raw.get("Attack", 0),
+            armor=raw.get("Armor", 0),
+            evasion=raw.get("Evasion", 0),
+            critical=raw.get("Crit", 0),
+            is_cosmetic=raw.get("IsCosmetic", False),
+            is_dc_purchasable=raw.get("IsMC", False)
         )
 
     def __str__(self) -> str:

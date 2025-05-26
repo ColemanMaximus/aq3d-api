@@ -1,10 +1,5 @@
-"""
-Module for snapshot related classes and functions,
-for representing a copy of snapshotted object structures as a dict.
-"""
-
-from abc import ABC
 from time import time
+from abc import ABC
 
 class Snapshot(ABC):
     """
@@ -47,29 +42,3 @@ class Snapshot(ABC):
 
     def __getitem__(self, key):
         return self._dict[key]
-
-
-class ServerSnapshot(Snapshot):
-    """
-    Captures a snapshot of a Server instance.
-
-    Useful for snapshot logging to external databases.
-    """
-
-    def __init__(self, server):
-        """
-        :param server: The server in which the snapshot should target.
-        """
-
-        super().__init__(server)
-
-    @property
-    def server_data(self) -> dict:
-        """
-        Returns a dict representation of a Server object structure.
-        Access data using scriptable keys.
-
-        :return: Returns a dict of server metadata.
-        """
-
-        return self._dict

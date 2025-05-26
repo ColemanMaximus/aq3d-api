@@ -1,6 +1,7 @@
 import requests
 
 from datetime import datetime
+from time import time
 from enum import Enum
 from json import JSONDecodeError
 
@@ -392,16 +393,33 @@ class Servers:
 
     api_url = "https://game.aq3d.com/api/game/GetServerList"
 
-    def __init__(self, servers = None, fromapi: bool = False):
+    def __init__(self,
+                 servers = None,
+                 fromapi: bool = False,
+                 auto_update_fromapi: bool = False,
+                 update_interval: int = 60
+                 ):
         """
         :param servers: Any Server objects to be added at initialization.
-        :param fromapi: If True, the constructor will gather all servers
+        :param fromapi: If true, the constructor will gather all servers
         from the official AQ3D API.
+        :param auto_update_fromapi: If true, any time the servers property
+        is called, it'll check to see if it needs refreshing based on the update
+        interval class attribute.
+        :param update_interval: How often should the auto update interval
+        be in seconds.
+
         """
 
         self.servers = servers
+        self.__last_updated = None
+
         if fromapi:
             self.servers = list(self.__fetch_servers_fromapi())
+            self.__last_updated = time()
+
+        self.__auto_update = auto_update_fromapi
+        self.__update_interval = update_interval
 
     @property
     def servers(self) -> tuple:
@@ -410,7 +428,10 @@ class Servers:
         
         :return tuple: A tuple of server objects.
         """
-        
+
+        if self.__auto_update:
+            self.__update_servers_fromapi()
+
         return tuple(self.__servers)
 
     @servers.setter
@@ -494,7 +515,23 @@ class Servers:
         if not self.servers:
             return None
 
-        return self.sorted_servers()[0]
+        return self.sorted_servers(online=True)[0]
+
+    @property
+    def __needs_updating(self) -> bool:
+        if (time() - self.__last_updated) < self.__update_interval:
+            print("No")
+            return False
+
+        print("Yes")
+        return True
+
+    def __update_servers_fromapi(self):
+        if not self.__needs_updating:
+            return
+
+        self.servers = self.__fetch_servers_fromapi()
+        self.__last_updated = time()
 
     def __fetch_servers_fromapi(self) -> tuple | None:
         """

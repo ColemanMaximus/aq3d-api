@@ -1,10 +1,24 @@
-from time import time
 from datetime import datetime
+from enum import Enum
 
 """ This module contains classes and functions for capturing server metadata."""
 
+
+class ServerStatus(Enum):
+    """
+    An Enum of server status codes, from ONLINE, OFFLINE,
+    and MAINTENANCE.
+    """
+
+    MAINTENANCE = "2"
+    ONLINE = "1",
+    OFFLINE = "0"
+
+
 class Server:
     """ Metadata about a server is bundled up into this Server class. """
+
+    maintenance_buffer = 10
 
     def __init__(self,
                  id: int,
@@ -16,7 +30,7 @@ class Server:
                  hostname: str = "",
                  port: int = 0,
                  access_level: int = 0,
-                 status: int = 0,
+                 status: ServerStatus = ServerStatus.OFFLINE,
                  last_updated: float = -1
                  ):
         """
@@ -30,7 +44,7 @@ class Server:
         :param hostname: The hostname the server operates on.
         :param port: The port number the server listens to.
         :param access_level: The access or permission level for the server.
-        :param status: The server uptime indicator, 1 meaning online.
+        :param status: The server uptime indicator, ONLINE, OFFLINE AND MAINTENANCE.
         """
 
         self.id = id
@@ -144,7 +158,9 @@ class Server:
         :return int: Number of online players.
         """
 
-        return self.__players
+        # Online servers themselves count towards player counts
+        # so we negate 1 to avoid counting a fake player.
+        return 0 if (self.__players <= 0) else (self.__players - 1)
 
     @players.setter
     def players(self, value: int):
@@ -254,11 +270,24 @@ class Server:
         self.__access_level = access_level
 
     @property
-    def status(self) -> int:
+    def status(self) -> ServerStatus:
+        """
+        Returns the status of the server, either
+        ONLINE, OFFLINE OR MAINTENANCE.
+
+        :return ServerStatus: Status of the server.
+        """
+
+        # When servers are in maintenance they usually have between 1 and 10
+        # players, accounting for devs. So it's safe to say within this range
+        # the server is likely in maintenance.
+        if 1 <= self.players <= self.maintenance_buffer:
+            return ServerStatus.MAINTENANCE
+
         return self.__status
 
     @status.setter
-    def status(self, status: int):
+    def status(self, status: ServerStatus):
         """
         Sets the status for the server, which acts as an
         uptime indicator, 0 is offline, 1 is online.
@@ -266,8 +295,8 @@ class Server:
         :param status: The status which can either be 0 or 1.
         """
 
-        if not isinstance(status, int) or not 0 <= status <= 1:
-            raise ValueError("Expected an integer for server status between 0 and 1.")
+        if not isinstance(status, ServerStatus):
+            raise ValueError("Expected a ServerStatus for server status, either ONLINE, OFFLINE OR MAINTENANCE.")
 
         self.__status = status
 
@@ -317,7 +346,7 @@ class Server:
         :return: Returns bool based on server status.
         """
 
-        return bool(self.status)
+        return self.status == ServerStatus.ONLINE
 
     @classmethod
     def create_raw(cls, raw):
@@ -340,14 +369,22 @@ class Server:
             hostname = raw.get("HostName"),
             port = raw.get("Port", 0),
             access_level = raw.get("AccessLevel", 0),
-            status = raw.get("Status", 0),
+            status = _statuscode_to_status(
+                raw.get("Status", ServerStatus.OFFLINE)
+            ),
             last_updated = datetime.strptime(
                 raw.get("LastUpdated", ""), "%Y-%m-%dT%H:%M:%S"
             ).timestamp()
         )
 
     def __str__(self) -> str:
-        online_status = f"{"Online" if self.is_online else "Offline"}"
+        online_status = self.status.name
         players = f"{self.players}/{self.max_players}"
 
         return f"{self.name} ({online_status}) -> {players}"
+
+def _statuscode_to_status(statuscode: int) -> ServerStatus:
+    if statuscode == 0:
+        return ServerStatus.OFFLINE
+
+    return ServerStatus.ONLINE

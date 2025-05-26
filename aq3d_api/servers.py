@@ -1,9 +1,8 @@
-from json import JSONDecodeError
-
 import requests
-from collections.abc import Sequence
+
 from datetime import datetime
 from enum import Enum
+from json import JSONDecodeError
 
 """ This module contains classes and functions for capturing server metadata."""
 
@@ -385,7 +384,7 @@ class Server:
         online_status = self.status.name
         players = f"{self.players}/{self.max_players}"
 
-        return f"{self.name} ({online_status}) -> {players}"
+        return f"({self.id}) {self.name} ({online_status}) -> {players}"
 
 
 class Servers:
@@ -402,7 +401,7 @@ class Servers:
 
         self.servers = servers
         if fromapi:
-            self.servers = self.__fetch_servers_fromapi()
+            self.servers = list(self.__fetch_servers_fromapi())
 
     @property
     def servers(self) -> tuple:
@@ -455,7 +454,7 @@ class Servers:
             self.__servers.append(server)
 
     @property
-    def players(self) -> int:
+    def total_players(self) -> int:
         """
         Returns the number of online players across all servers.
 
@@ -466,6 +465,36 @@ class Servers:
             return 0
 
         return sum([server.players for server in self.servers])
+
+    def sorted_servers(self, reverse: bool = True, online: bool = False) -> tuple | None:
+        """
+        Returns a sorted tuple of servers by player counts.
+
+        :param reverse: If the sorted servers should be reversed.
+        :param online: If the servers should only include online servers.
+        :return: Returns a sorted tuple of servers, otherwise None.
+        """
+
+        return tuple(
+            sorted(
+                self.servers if not online else self.online_servers,
+                key=lambda server: server.players,
+                reverse=reverse
+            )
+        )
+
+    @property
+    def highest_population(self) -> Server | None:
+        """
+        Returns the server which has the most online players.
+
+        :return: The server with the most players online.
+        """
+
+        if not self.servers:
+            return None
+
+        return self.sorted_servers()[0]
 
     def __fetch_servers_fromapi(self) -> tuple | None:
         """
@@ -494,7 +523,9 @@ class Servers:
         return iter(self.servers)
 
     def __str__(self):
-        response = f"Servers ({len(self.servers)}): Players -> {self.players}"
+        response = \
+            f"Servers ({len(self.servers)}): Players -> {self.total_players}"
+
         for server in self.servers:
             response += f"\n  - {server}"
 

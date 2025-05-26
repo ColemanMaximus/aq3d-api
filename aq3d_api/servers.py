@@ -1,3 +1,5 @@
+""" This module contains classes and functions for capturing server metadata."""
+
 import requests
 
 from datetime import datetime
@@ -5,7 +7,7 @@ from time import time
 from enum import Enum
 from json import JSONDecodeError
 
-""" This module contains classes and functions for capturing server metadata."""
+from aq3d_api.snapshots import Snapshot
 
 
 class ServerStatus(Enum):
@@ -17,6 +19,35 @@ class ServerStatus(Enum):
     MAINTENANCE = "2"
     ONLINE = "1",
     OFFLINE = "0"
+
+
+class ServerSnapshot(Snapshot):
+    """
+    Captures a snapshot of a Server instance.
+
+    Useful for snapshot logging to external databases.
+    """
+
+    def __init__(self, server):
+        """
+        :param server: The server in which the snapshot should target.
+        """
+
+        if not isinstance(server, Server):
+            raise ValueError("Was expecting an instance of Server for the snapshots.")
+
+        super().__init__(server)
+
+    @property
+    def server_data(self) -> dict:
+        """
+        Returns a dict representation of a Server object structure.
+        Access data using scriptable keys.
+
+        :return: Returns a dict of server metadata.
+        """
+
+        return self._dict
 
 
 class Server:
@@ -352,6 +383,9 @@ class Server:
 
         return self.status == ServerStatus.ONLINE
 
+    def create_snapshot(self) -> ServerSnapshot:
+        return ServerSnapshot(self)
+
     @classmethod
     def create_raw(cls, raw):
         """
@@ -520,10 +554,8 @@ class Servers:
     @property
     def __needs_updating(self) -> bool:
         if (time() - self.__last_updated) < self.__update_interval:
-            print("No")
             return False
 
-        print("Yes")
         return True
 
     def __update_servers_fromapi(self):

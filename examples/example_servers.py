@@ -2,7 +2,9 @@ from aq3d_api.servers import Servers
 
 
 def get_servers() -> Servers:
-    return Servers(fromapi=True, auto_update_fromapi=True)
+    # Creating a Servers instance which fetches the server data
+    # from the api directly and automatically updates with fresh data.
+    return Servers(fromapi=True, auto_update_fromapi=True, update_interval=60)
 
 
 servers = get_servers()

@@ -16,13 +16,13 @@ class ServerStatus(Enum):
     and MAINTENANCE.
     """
 
-    MAINTENANCE = "2"
-    ONLINE = "1",
-    OFFLINE = "0"
+    MAINTENANCE = 2
+    ONLINE = 1
+    OFFLINE = 0
 
 
 class Server:
-    """ Metadata about a server is bundled up into this Server class. """
+    """ Metadata about a server is bundled up into a Server class. """
 
     maintenance_buffer = 10
 

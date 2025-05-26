@@ -1,3 +1,6 @@
+from json import JSONDecodeError
+
+import requests
 from collections.abc import Sequence
 from datetime import datetime
 from enum import Enum
@@ -388,13 +391,18 @@ class Server:
 class Servers:
     """ A class bundle of related servers, and useful methods. """
 
-    def __init__(self, servers: list[Server] = None):
+    api_url = "https://game.aq3d.com/api/game/GetServerList"
+
+    def __init__(self, servers = None, fromapi: bool = False):
         """
-        
         :param servers: Any Server objects to be added at initialization.
+        :param fromapi: If True, the constructor will gather all servers
+        from the official AQ3D API.
         """
 
         self.servers = servers
+        if fromapi:
+            self.servers = self.__fetch_servers_fromapi()
 
     @property
     def servers(self) -> tuple:
@@ -407,12 +415,16 @@ class Servers:
         return tuple(self.__servers)
 
     @servers.setter
-    def servers(self, servers: Sequence[Server]):
+    def servers(self, servers = None):
         """
         Sets the servers attribute to an initial sequence of servers.
 
         :param servers: The servers to add to this Servers instance.
         """
+
+        if not servers:
+            self.__servers = servers
+            return
 
         self.__servers = [
             server for server in servers if isinstance(server, Server)
@@ -439,7 +451,8 @@ class Servers:
         if not isinstance(server, Server):
             raise ValueError(f"Expected a Server object but instead received {type(server)}.")
 
-        self.__servers.append(server)
+        if self.servers:
+            self.__servers.append(server)
 
     @property
     def players(self) -> int:
@@ -453,6 +466,23 @@ class Servers:
             return 0
 
         return sum([server.players for server in self.servers])
+
+    def __fetch_servers_fromapi(self) -> tuple | None:
+        """
+        Gets all servers from the official AQ3D API.
+
+        :return tuple: A tuple of Server objects.
+        """
+
+        response = requests.get(self.api_url)
+        if not response.ok:
+            return None
+
+        try:
+            raw_servers = response.json()["Servers"]
+            return tuple(Server.create_raw(raw_server) for raw_server in raw_servers)
+        except JSONDecodeError:
+            raise ValueError("Invalid JSON was received from the api.")
 
     def __getitem__(self, index: int):
         if not isinstance(index, int):

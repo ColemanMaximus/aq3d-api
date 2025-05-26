@@ -1,12 +1,8 @@
-import requests
-from aq3d_api.servers import Server, Servers
+from aq3d_api.servers import Servers
 
-servers_api_url = "https://game.aq3d.com/api/game/GetServerList"
 
-def get_servers(url: str) -> Servers:
-    json_res = requests.get(url).json()
-    return Servers(
-        [Server.create_raw(server) for server in json_res["Servers"]]
-    )
+def get_servers() -> Servers:
+    return Servers(fromapi=True)
 
-servers = get_servers(servers_api_url)
+
+servers = get_servers()

@@ -336,6 +336,7 @@ class Item(ItemAttributes):
         return cls(
             item_id=raw.get("ID"),
             name=raw.get("Name"),
+            level=raw.get("Level", 1),
             description=raw.get("Desc", ""),
             price=raw.get("Cost", 0),
             item_type=utils.to_enum(

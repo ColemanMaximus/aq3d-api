@@ -1,6 +1,8 @@
 """ This module contains the Items class container. """
+from collections.abc import Generator
 
 from aq3d_api.items.item import Item
+from aq3d_api.enums.item_type import ItemType
 from aq3d_api.api.updater import APIUpdater
 from aq3d_api.api.handler import send_req_items
 
@@ -10,8 +12,6 @@ class Items(APIUpdater):
     Items container class to bundle items together.
     Supports the APIUpdater class.
     """
-
-    api_bulk_req_limit = 200
 
     def __init__(self,
                  items = None,
@@ -40,6 +40,17 @@ class Items(APIUpdater):
 
         super().__init__(auto_update_fromapi, update_interval)
 
+    @property
+    def items(self) -> Generator:
+        return (item for item in self.__items)
+
+    @items.setter
+    def items(self, items):
+        self.__items = items
+
+    def items_by_type(self, item_type: ItemType) -> Generator[Item]:
+        return (item for item in self.items if item.type == item_type)
+
     def __fetch_fromapi(self) -> list | None:
         """
         Requests items to be fetched from the official API.
@@ -52,5 +63,12 @@ class Items(APIUpdater):
 
         return items
 
-    def __iter__(self) -> iter:
-        return iter(self.items)
+    def __str__(self) -> str:
+        string = f"Items ({len(self.__items)}):"
+        for item in self.items:
+            string += f"\n  - ({item.id} | {item.type.name}) {item.name}"
+
+        return string
+
+    def __iter__(self) -> Generator[Item]:
+        return self.items

@@ -38,16 +38,71 @@ def send_req_servers() -> dict:
     return send_api_req(APIURLS.GET_SERVERS.value[0])
 
 
-def send_req_items(min_items: int = 1,
-                   max_items: int = 1,
+def send_req_range(url: str,
+                   method: str = "GET",
+                   param_key: str = "",
+                   min_index: int = 1,
+                   max_index: int = 1,
+                   bulk_max: int = 200) -> list:
+    """
+    :param url: The URL used to send an HTTP request to.
+    :param method: Which HTTP method to use.
+    :param param_key: The param key used to gather specific data.
+    :param min_index: Where should the param key index start.
+    :param max_index: Where should the param key index end.
+    :param bulk_max: How many parameter key values can be added each request.
+    :return: The result of the range of requests.
+    """
+
+    index_range_diff = max_index - min_index
+    reqs_needed = (
+        (index_range_diff // bulk_max),
+        # The remainder of items remaining, used for
+        # last second requests.
+        (index_range_diff % bulk_max)
+    )
+
+    max_iteration = reqs_needed[0]
+    if reqs_needed[-1] > 0:
+        max_iteration += 1
+
+    indices = []
+    for req_num in range(1, max_iteration + 1):
+        start_index = (bulk_max * (req_num - 1)) + 1 \
+            if req_num > 1 else 1
+
+        # We should begin the start index at the min value
+        # if the min value is above 1.
+        if min_index > 1:
+            start_index += min_index
+
+        end_index = (start_index + bulk_max)
+        if req_num >= max_iteration:
+            end_index = (start_index + reqs_needed[-1])
+
+        params = {param_key: [
+            key_id for key_id in range(start_index, end_index)
+        ]}
+
+        response = send_api_req(url, method, params)
+        if isinstance(response, dict):
+            indices += [indice[-1] for indice in response.items()]
+            continue
+
+        indices += send_api_req(url, method, params)
+    return indices
+
+
+def send_req_items(min_index: int = 1,
+                   max_index: int = 1,
                    bulk_max: int = 200) -> list:
 
     """
     Sends a request to the API to fetch a range of items
     from their IDs.
 
-    :param min_items: The start index for item IDs.
-    :param max_items: The end index for item IDs.
+    :param min_index: The start index for item IDs.
+    :param max_index: The end index for item IDs.
     :param bulk_max: How many IDs there can be within each bulk request.
     :return: Returns a dict object of item data from JSON form.
     """
@@ -55,37 +110,24 @@ def send_req_items(min_items: int = 1,
     url = APIURLS.GET_ITEMS.value[0]
     param_key = APIURLS.GET_ITEMS.value[1]
 
-    item_range_diff = max_items - min_items
-    reqs_needed = (
-        (item_range_diff // bulk_max),
-        # The remainder of items remaining, used for
-        # last second requests.
-        (item_range_diff % bulk_max)
-    )
+    return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)
 
-    max_iteration = reqs_needed[0]
-    if reqs_needed[-1] > 0:
-        max_iteration += 1
 
-    items = []
-    for req_num in range(1, max_iteration + 1):
-        start_index = (bulk_max * (req_num - 1)) + 1 \
-            if req_num > 1 else 1
+def send_req_maps(min_index: int = 1,
+                   max_index: int = 1,
+                   bulk_max: int = 200) -> list:
 
-        # We should begin the start index at the min value
-        # if the min value is above 1.
-        if min_items > 1:
-            start_index += min_items
+    """
+    Sends a request to the API to fetch a range of maps
+    from their IDs.
 
-        end_index = (start_index + bulk_max)
-        if req_num >= max_iteration:
-            end_index = (start_index + reqs_needed[-1])
+    :param min_index: The start index for map IDs.
+    :param max_index: The end index for map IDs.
+    :param bulk_max: How many IDs there can be within each bulk request.
+    :return: Returns a dict object of map data from JSON form.
+    """
 
-        params = {param_key: [
-                key_id for key_id in range(start_index, end_index)
-            ]
-        }
+    url = APIURLS.GET_MAPS.value[0]
+    param_key = APIURLS.GET_MAPS.value[1]
 
-        items += send_api_req(url, "POST", params)
-
-    return items
+    return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)

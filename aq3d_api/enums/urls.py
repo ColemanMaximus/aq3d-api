@@ -10,5 +10,6 @@ class APIURLS(Enum):
     The Enum class for API URLs.
     """
 
-    GET_ITEMS = f"{base_api_url}/GetItems", "IDs"
     GET_SERVERS = f"{base_api_url}/GetServerList", ""
+    GET_ITEMS = f"{base_api_url}/GetItems", "IDs"
+    GET_MAPS = f"{base_api_url}/GetDungeons", "IDs"

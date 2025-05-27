@@ -13,6 +13,10 @@ have complete practical coverage of the AQ3D API.
   - POST fetch items using item IDs.
   - Use a min and max range to fetch a range of items.
 
+
+Save data CSV and JSON files with a single method either
+`to_csv(Path)` or `to_json_file(Path)` on the container objects.
+
 ---
 
 ### TODOs

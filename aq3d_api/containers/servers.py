@@ -1,14 +1,14 @@
 """ This module contains then Servers container class. """
-from pathlib import Path
+from collections.abc import Generator
 from requests import JSONDecodeError
 
-from aq3d_api import utils
 from aq3d_api.api.updater import APIUpdater
+from aq3d_api.containers.container import DataContainer
 from aq3d_api.servers.server import Server
 from aq3d_api.snapshots.server import ServerSnapshot
 from aq3d_api.api.handler import send_req_servers
 
-class Servers(APIUpdater):
+class Servers(DataContainer, APIUpdater):
     """ A class bundle of related servers, and useful methods. """
 
     def __init__(self,
@@ -36,17 +36,17 @@ class Servers(APIUpdater):
         super().__init__(auto_update_fromapi, update_interval)
 
     @property
-    def servers(self) -> tuple:
+    def servers(self) -> Generator[Server]:
         """
         Returns all servers within this Servers instance.
 
-        :return tuple: A tuple of Server objects.
+        :return: Generator of Server objects.
         """
 
         if self._auto_update:
             self._update_fromapi()
 
-        return tuple(self.__servers)
+        return self._objs
 
     @servers.setter
     def servers(self, servers=None):
@@ -57,23 +57,23 @@ class Servers(APIUpdater):
         """
 
         if not servers:
-            self.__servers = servers
+            self._objs = servers
             return
 
-        self.__servers = [
+        self._objs = [
             server for server in servers if isinstance(server, Server)
         ]
 
     @property
-    def online_servers(self) -> tuple:
+    def online_servers(self) -> Generator:
         """
         Gets all servers are on online, filtering offline
         and maintenance servers.
 
-        :return tuple: Returns a tuple of online servers.
+        :return: Returns a generator of online servers.
         """
 
-        return tuple(server for server in self.servers if server.is_online)
+        return (server for server in self.servers if server.is_online)
 
     def add(self, server: Server):
         """
@@ -86,7 +86,9 @@ class Servers(APIUpdater):
             raise ValueError(f"Expected a Server object but instead received {type(server)}.")
 
         if self.servers:
-            self.__servers.append(server)
+            servers = list(self._objs)
+            servers.append(server)
+            self.servers = servers
 
     @property
     def total_players(self) -> int:
@@ -101,7 +103,7 @@ class Servers(APIUpdater):
 
         return sum([server.players for server in self.servers])
 
-    def sorted_servers(self, reverse: bool = True, online: bool = False) -> tuple | None:
+    def sorted_servers(self, reverse: bool = True, online: bool = False) -> Generator[Server] | None:
         """
         Returns a sorted tuple of servers by player counts.
 
@@ -110,7 +112,7 @@ class Servers(APIUpdater):
         :return: Returns a sorted tuple of servers, otherwise None.
         """
 
-        return tuple(
+        return (server for server in
             sorted(
                 self.servers if not online else self.online_servers,
                 key=lambda server: server.players,
@@ -129,9 +131,9 @@ class Servers(APIUpdater):
         if not self.servers:
             return None
 
-        return self.sorted_servers(online=True)[0]
+        return list(self.sorted_servers(online=True))[0]
 
-    def create_snapshots(self, online_only: bool = True) -> tuple:
+    def create_snapshots(self, online_only: bool = True) -> Generator[ServerSnapshot]:
         """
         Generates a snapshot of each server assigned to this instance.
 
@@ -139,37 +141,11 @@ class Servers(APIUpdater):
         :return: Tuple of sever snapshots.
         """
 
-        snapshots = tuple(
-            [ServerSnapshot(server)
-             for server in self.sorted_servers(online=online_only)]
+        snapshots = (
+            ServerSnapshot(server)
+             for server in self.sorted_servers(online=online_only)
         )
         return snapshots
-
-    def to_csv(self, path: Path):
-        """
-        Useful method to export all the servers within this Servers object
-        into a csv file.
-
-        :param path: The path to write the servers to.
-        """
-
-        if not isinstance(path, Path):
-            raise ValueError("Expected a Path instance to write the servers to.")
-
-        utils.to_csv(list(self.servers), path)
-
-    def to_json_file(self, path: Path):
-        """
-        Useful method to export all the servers within this Servers object
-        into a json file.
-
-        :param path: The path to write the servers to.
-        """
-
-        if not isinstance(path, Path):
-            raise ValueError("Expected a Path instance to write the servers to.")
-
-        utils.to_json_file(list(self.servers), path)
 
     def __fetch_fromapi(self) -> tuple | None:
         """
@@ -184,18 +160,9 @@ class Servers(APIUpdater):
         except JSONDecodeError:
             raise ValueError("Invalid JSON was received from the api.")
 
-    def __getitem__(self, index: int):
-        if not isinstance(index, int):
-            raise ValueError("Expected an index of the server.")
-
-        return self.__servers[index]
-
-    def __iter__(self) -> iter:
-        return iter(self.servers)
-
     def __str__(self):
         response = \
-            f"Servers ({len(self.servers)}): Players -> {self.total_players}"
+            f"Servers ({len(list(self.servers))}): Players -> {self.total_players}"
 
         for server in self.servers:
             response += f"\n  - {server}"

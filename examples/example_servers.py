@@ -1,4 +1,4 @@
-from aq3d_api.servers.containers import Servers
+from aq3d_api.containers.servers import Servers
 
 
 def get_servers() -> Servers:

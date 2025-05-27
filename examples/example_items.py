@@ -2,7 +2,7 @@ from pathlib import Path
 
 from aq3d_api import utils
 from aq3d_api.enums.item_rarity import ItemRarity
-from aq3d_api.items.containers import Items
+from aq3d_api.containers.items import Items
 
 
 def get_items(min_index: int, max_index: int):

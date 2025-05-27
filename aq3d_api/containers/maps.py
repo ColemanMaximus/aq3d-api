@@ -1,15 +1,14 @@
 """ This module contains the Maps class. """
 
 from collections.abc import Generator
-from pathlib import Path
 
-from aq3d_api import utils
 from aq3d_api.api.handler import send_req_maps
 from aq3d_api.api.updater import APIUpdater
+from aq3d_api.containers.container import DataContainer
 from aq3d_api.maps.map import Map
 
 
-class Maps(APIUpdater):
+class Maps(DataContainer, APIUpdater):
     def __init__(self,
                  maps = None,
                  fromapi: bool = False,
@@ -39,7 +38,7 @@ class Maps(APIUpdater):
         super().__init__(auto_update_fromapi, update_interval)
 
     @property
-    def maps(self) -> Generator:
+    def maps(self) -> Generator[Map]:
         """
         Returns all maps within this Maps instance.
 
@@ -49,7 +48,7 @@ class Maps(APIUpdater):
         if self._auto_update:
             self._update_fromapi()
 
-        return (map for map in self.__maps)
+        return self._objs
 
     @maps.setter
     def maps(self, maps=None):
@@ -60,10 +59,10 @@ class Maps(APIUpdater):
         """
 
         if not maps:
-            self.__maps = maps
+            self._objs = maps
             return
 
-        self.__maps = [
+        self._objs = [
             map for map in maps if isinstance(map, Map)
         ]
 
@@ -85,32 +84,6 @@ class Maps(APIUpdater):
 
         return (map for map in self.maps if map.__getattribute__(key))
 
-    def to_csv(self, path: Path):
-        """
-        Useful method to export all the maps within this Maps object
-        into a csv file.
-
-        :param path: The path to write the maps to.
-        """
-
-        if not isinstance(path, Path):
-            raise ValueError("Expected a Path instance to write the maps to.")
-
-        utils.to_csv(list(self.maps), path)
-
-    def to_json_file(self, path: Path):
-        """
-        Useful method to export all the maps within this Maps object
-        into a json file.
-
-        :param path: The path to write the maps to.
-        """
-
-        if not isinstance(path, Path):
-            raise ValueError("Expected a Path instance to write the maps to.")
-
-        utils.to_json_file(list(self.maps), path)
-
     def __fetch_fromapi(self) -> list | None:
         """
         Requests maps to be fetched from the official API.
@@ -120,13 +93,3 @@ class Maps(APIUpdater):
 
         raw_items = send_req_maps(self.__api_maps_min, self.__api_maps_max)
         return [Map.create_raw(item) for item in raw_items]
-
-    def __str__(self) -> str:
-        string = f"Maps ({len(self.__maps)}):"
-        for map in self.maps:
-            string += f"\n  - ({map.id}) {map.name}"
-
-        return string
-
-    def __iter__(self) -> Generator[Map]:
-        return self.maps

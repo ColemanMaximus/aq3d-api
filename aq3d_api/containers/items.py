@@ -1,8 +1,7 @@
 """ This module contains the Items class container. """
 from collections.abc import Generator
-from pathlib import Path
 
-from aq3d_api import utils
+from aq3d_api.containers.container import DataContainer
 from aq3d_api.items.item import Item
 from aq3d_api.enums.item_type import ItemType
 from aq3d_api.enums.item_equip_type import ItemEquipType
@@ -11,7 +10,7 @@ from aq3d_api.api.updater import APIUpdater
 from aq3d_api.api.handler import send_req_items
 
 
-class Items(APIUpdater):
+class Items(DataContainer, APIUpdater):
     """
     Items container class to bundle items together.
     Supports the APIUpdater class.
@@ -45,14 +44,14 @@ class Items(APIUpdater):
         super().__init__(auto_update_fromapi, update_interval)
 
     @property
-    def items(self) -> Generator:
+    def items(self) -> Generator[Item]:
         """
         Returns a generator of Item objects within the Items container class.
 
         :return: Returns a generator of Item objects.
         """
 
-        return (item for item in self.__items)
+        return (item for item in self._objs)
 
     @items.setter
     def items(self, items):
@@ -63,10 +62,10 @@ class Items(APIUpdater):
         """
 
         if not items:
-            self.__items = items
+            self._objs = items
             return
 
-        self.__items = [
+        self._objs = [
             item for item in items if isinstance(item, Item)
         ]
 
@@ -105,32 +104,6 @@ class Items(APIUpdater):
 
         return (item for item in self.items if item.__getattribute__(key))
 
-    def to_csv(self, path: Path):
-        """
-        Useful method to export all the items within this Items object
-        into a csv file.
-
-        :param path: The path to write the items to.
-        """
-
-        if not isinstance(path, Path):
-            raise ValueError("Expected a Path instance to write the items to.")
-
-        utils.to_csv(list(self.items), path)
-
-    def to_json_file(self, path: Path):
-        """
-        Useful method to export all the items within this Items object
-        into a json file.
-
-        :param path: The path to write the items to.
-        """
-
-        if not isinstance(path, Path):
-            raise ValueError("Expected a Path instance to write the items to.")
-
-        utils.to_json_file(list(self.items), path)
-
     def __fetch_fromapi(self) -> list | None:
         """
         Requests items to be fetched from the official API.
@@ -142,13 +115,3 @@ class Items(APIUpdater):
         items = [Item.create_raw(item) for item in raw_items]
 
         return items
-
-    def __str__(self) -> str:
-        string = f"Items ({len(self.__items)}):"
-        for item in self.items:
-            string += f"\n  - ({item.id} | {item.type.name}) {item.name}"
-
-        return string
-
-    def __iter__(self) -> Generator[Item]:
-        return self.items

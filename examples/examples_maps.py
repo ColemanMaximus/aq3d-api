@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from aq3d_api import utils
-from aq3d_api.maps.containers import Maps
+from aq3d_api.containers.maps import Maps
 
 
 def get_maps(min_index: int = 1, max_index: int = 1, bulk_max: int = 200):

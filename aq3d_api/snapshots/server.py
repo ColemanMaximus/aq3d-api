@@ -1,3 +1,5 @@
+""" This module contains the ServerSnapshot class. """
+
 from aq3d_api.snapshots.snapshot import Snapshot
 
 class ServerSnapshot(Snapshot):

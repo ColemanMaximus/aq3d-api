@@ -1,4 +1,7 @@
+""" This module contains the Enum class for server status types. """
+
 from enum import Enum
+
 
 class ServerStatus(Enum):
     """

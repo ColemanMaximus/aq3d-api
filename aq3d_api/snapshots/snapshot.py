@@ -1,3 +1,5 @@
+""" This module contains the base class for Snapshot derivatives. """
+
 from time import time
 from abc import ABC
 

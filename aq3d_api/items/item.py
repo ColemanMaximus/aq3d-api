@@ -1,3 +1,5 @@
+""" This module contains the Item class. """
+
 import aq3d_api.utils as utils
 
 from aq3d_api.items.attributes import ItemAttributes

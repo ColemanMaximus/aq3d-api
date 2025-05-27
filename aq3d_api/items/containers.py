@@ -1,63 +1,54 @@
-import requests
-from requests import JSONDecodeError
+""" This module contains the Items class container. """
 
 from aq3d_api.items.item import Item
-from aq3d_api.updater.api_updater import APIUpdater
+from aq3d_api.api.updater import APIUpdater
+from aq3d_api.api.handler import send_req_items
 
 
 class Items(APIUpdater):
-    api_url = "https://game.aq3d.com/api/Game/GetItems"
-    param_key = "IDs"
+    """
+    Items container class to bundle items together.
+    Supports the APIUpdater class.
+    """
+
     api_bulk_req_limit = 200
 
     def __init__(self,
                  items = None,
                  fromapi: bool = False,
-                 api_item_max: int = 0,
+                 api_items_min: int = 1,
+                 api_items_max: int = 1,
                  auto_update_fromapi: bool = False,
                  update_interval: int = 60
                  ):
+
+        """
+        :param items: The items which should be added to the container of initialization.
+        :param fromapi: Should items be fetched from the official API.
+        :param api_items_min: The start index for item IDs to be fetched.
+        :param api_items_max: The end index for item IDs to be fetched.
+        :param auto_update_fromapi: If items data should be refreshed after the update interval.
+        :param update_interval: After how many seconds until new item data should be fetched.
+        """
+
         self.items = items
-        self.api_item_max = api_item_max
+        self.api_item_min = api_items_min
+        self.api_item_max = api_items_max
+
         if fromapi:
             self.items = self.__fetch_fromapi()
 
         super().__init__(auto_update_fromapi, update_interval)
 
     def __fetch_fromapi(self) -> list | None:
-        bulk_req_limit = self.api_bulk_req_limit
-        item_limit = self.api_item_max
+        """
+        Requests items to be fetched from the official API.
 
-        get_reqs_needed = (
-            (item_limit // bulk_req_limit), (item_limit % bulk_req_limit)
-        )
+        :return: The fetched items as a list of Item objects.
+        """
 
-        items = []
-        max_iteration = get_reqs_needed[0]
-        if get_reqs_needed[-1] > 0:
-            max_iteration += 1
-
-        for req_num in range(1, max_iteration + 1):
-            start_index = (bulk_req_limit * (req_num - 1)) + 1\
-                if req_num > 1 else 1
-
-            end_index = (start_index + bulk_req_limit)
-            if req_num >= max_iteration:
-                end_index = (start_index + get_reqs_needed[-1])
-
-            params = {self.param_key: [
-                    key_id for key_id in range(start_index, end_index)
-                ]
-            }
-
-            response = requests.post(self.api_url, params=params)
-            try:
-                raw_items = response.json()
-                items += [Item.create_raw(item) for item in raw_items]
-            except JSONDecodeError:
-                raise JSONDecodeError(
-                    "Invalid item data was retrieved from the api."
-                )
+        raw_items = send_req_items(self.api_item_min, self.api_item_max)
+        items = [Item.create_raw(item) for item in raw_items]
 
         return items
 

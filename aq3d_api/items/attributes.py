@@ -1,3 +1,6 @@
+""" This module contains the ItemAttributes class. """
+
+
 class ItemAttributes:
     """
     A class for item attributes, including stats such as

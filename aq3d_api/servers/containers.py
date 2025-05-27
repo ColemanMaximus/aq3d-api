@@ -1,14 +1,14 @@
-import requests
+""" This module contains then Servers container class. """
+
 from requests import JSONDecodeError
 
-from aq3d_api.updater.api_updater import APIUpdater
+from aq3d_api.api.updater import APIUpdater
 from aq3d_api.servers.server import Server
 from aq3d_api.snapshots.server import ServerSnapshot
+from aq3d_api.api.handler import send_req_servers
 
 class Servers(APIUpdater):
     """ A class bundle of related servers, and useful methods. """
-
-    api_url = "https://game.aq3d.com/api/game/GetServerList"
 
     def __init__(self,
                  servers=None,
@@ -151,12 +151,8 @@ class Servers(APIUpdater):
         :return tuple: A tuple of Server objects.
         """
 
-        response = requests.get(self.api_url)
-        if not response.ok:
-            return None
-
         try:
-            raw_servers = response.json()["Servers"]
+            raw_servers = send_req_servers()["Servers"]
             return tuple(Server.create_raw(raw_server) for raw_server in raw_servers)
         except JSONDecodeError:
             raise ValueError("Invalid JSON was received from the api.")

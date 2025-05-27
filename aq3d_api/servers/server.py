@@ -1,3 +1,5 @@
+""" THis module contains the Server class. """
+
 from datetime import datetime
 
 from aq3d_api.enums.server_status import ServerStatus

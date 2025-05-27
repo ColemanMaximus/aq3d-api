@@ -2,7 +2,7 @@
 from collections.abc import Generator
 from pathlib import Path
 
-import aq3d_api.utils as utils
+from aq3d_api import utils
 from aq3d_api.items.item import Item
 from aq3d_api.enums.item_type import ItemType
 from aq3d_api.enums.item_equip_type import ItemEquipType
@@ -111,6 +111,19 @@ class Items(APIUpdater):
             raise ValueError("Expected a Path instance to write the items to.")
 
         utils.to_csv(list(self.items), path)
+
+    def to_json_file(self, path: Path):
+        """
+        Useful method to export all the items within this Items object
+        into a json file.
+
+        :param path: The path to write the items to.
+        """
+
+        if not isinstance(path, Path):
+            raise ValueError("Expected a Path instance to write the items to.")
+
+        utils.to_json_file(list(self.items), path)
 
     def __fetch_fromapi(self) -> list | None:
         """

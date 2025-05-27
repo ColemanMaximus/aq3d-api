@@ -1,7 +1,7 @@
-""" THis module contains the Server class. """
-
+""" This module contains the Server class. """
 from datetime import datetime
 
+from aq3d_api import utils
 from aq3d_api.enums.server_status import ServerStatus
 from aq3d_api.snapshots.server import ServerSnapshot
 
@@ -369,6 +369,15 @@ class Server:
                 raw.get("LastUpdated", ""), "%Y-%m-%dT%H:%M:%S"
             ).timestamp()
         )
+
+    def to_dict(self) -> dict:
+        """
+        Quickly converts the objects attributes to a dict.
+
+        :return: The dict representation of the objects attributes.
+        """
+
+        return utils.to_dict(self)
 
     def __str__(self) -> str:
         online_status = self.status.name

@@ -1,7 +1,8 @@
 """ This module contains then Servers container class. """
-
+from pathlib import Path
 from requests import JSONDecodeError
 
+from aq3d_api import utils
 from aq3d_api.api.updater import APIUpdater
 from aq3d_api.servers.server import Server
 from aq3d_api.snapshots.server import ServerSnapshot
@@ -143,6 +144,32 @@ class Servers(APIUpdater):
              for server in self.sorted_servers(online=online_only)]
         )
         return snapshots
+
+    def to_csv(self, path: Path):
+        """
+        Useful method to export all the servers within this Servers object
+        into a csv file.
+
+        :param path: The path to write the servers to.
+        """
+
+        if not isinstance(path, Path):
+            raise ValueError("Expected a Path instance to write the servers to.")
+
+        utils.to_csv(list(self.servers), path)
+
+    def to_json_file(self, path: Path):
+        """
+        Useful method to export all the servers within this Servers object
+        into a json file.
+
+        :param path: The path to write the servers to.
+        """
+
+        if not isinstance(path, Path):
+            raise ValueError("Expected a Path instance to write the servers to.")
+
+        utils.to_json_file(list(self.servers), path)
 
     def __fetch_fromapi(self) -> tuple | None:
         """

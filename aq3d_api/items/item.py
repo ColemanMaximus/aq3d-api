@@ -359,11 +359,14 @@ class Item(ItemAttributes):
             is_dc_purchasable=raw.get("IsMC", False)
         )
 
-    def __str__(self) -> str:
-        # Filter any redundant keypair values from the object dict.
-        filtered_dict = {
-            key.split("__")[-1]: value
-            for key, value in self.__dict__.items() if value
-        }
+    def to_dict(self) -> dict:
+        """
+        Quickly converts the objects attributes to a dict.
 
-        return str(filtered_dict)
+        :return: The dict representation of the objects attributes.
+        """
+
+        return utils.to_dict(self)
+
+    def __str__(self) -> str:
+        return str(self.to_dict())

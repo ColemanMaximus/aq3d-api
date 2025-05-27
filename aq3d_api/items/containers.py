@@ -3,6 +3,8 @@ from collections.abc import Generator
 
 from aq3d_api.items.item import Item
 from aq3d_api.enums.item_type import ItemType
+from aq3d_api.enums.item_equip_type import ItemEquipType
+from aq3d_api.enums.item_rarity import ItemRarity
 from aq3d_api.api.updater import APIUpdater
 from aq3d_api.api.handler import send_req_items
 
@@ -42,14 +44,58 @@ class Items(APIUpdater):
 
     @property
     def items(self) -> Generator:
+        """
+        Returns a generator of Item objects within the Items container class.
+
+        :return: Returns a generator of Item objects.
+        """
+
         return (item for item in self.__items)
 
     @items.setter
     def items(self, items):
+        """
+        Sets the items container to a list of Item objects.
+
+        :param items: The items to supply the container.
+        """
+
         self.__items = items
 
-    def items_by_type(self, item_type: ItemType) -> Generator[Item]:
-        return (item for item in self.items if item.type == item_type)
+    def items_by_type(self, filter_type: ItemType | ItemEquipType | ItemRarity) -> Generator[Item]:
+        """
+        Returns a filtered list of items by enum types.
+
+        Accepts an ItemType, ItemEquipType or ItemRarity types.
+
+        :param filter_type: The enum type to filter by.
+        :return: Generator of filtered items.
+        """
+
+        if isinstance(filter_type, ItemRarity):
+            return (item for item in self.items if item.rarity == filter_type)
+        if isinstance(filter_type, ItemEquipType):
+            return (item for item in self.items if item.equip_type == filter_type)
+
+        return (item for item in self.items if item.type == filter_type)
+
+    def items_by_keypair(self, key: str, value) -> Generator[Item]:
+        """
+        Returns a filtered list of Item objects if they have
+        the matching key value pair.
+
+        :param key: The key you want to filter by.
+        :param value: The value the key should be to be considered a match.
+        :return: A generator of filtered Item objects.
+        """
+
+        if not isinstance(key, str):
+            raise ValueError("Expected a string of an items key.")
+
+        if not value:
+            raise ValueError("Expected a non empty value for keys value.")
+
+        return (item for item in self.items if item.__getattribute__(key))
 
     def __fetch_fromapi(self) -> list | None:
         """

@@ -36,8 +36,8 @@ class Items(APIUpdater):
         """
 
         self.items = items
-        self.api_item_min = api_items_min
-        self.api_item_max = api_items_max
+        self.__api_item_min = api_items_min
+        self.__api_item_max = api_items_max
 
         if fromapi:
             self.items = self.__fetch_fromapi()
@@ -62,7 +62,13 @@ class Items(APIUpdater):
         :param items: The items to supply the container.
         """
 
-        self.__items = items
+        if not items:
+            self.__items = items
+            return
+
+        self.__items = [
+            item for item in items if isinstance(item, Item)
+        ]
 
     def items_by_type(self, filter_type: ItemType | ItemEquipType | ItemRarity) -> Generator[Item]:
         """
@@ -132,7 +138,7 @@ class Items(APIUpdater):
         :return: The fetched items as a list of Item objects.
         """
 
-        raw_items = send_req_items(self.api_item_min, self.api_item_max)
+        raw_items = send_req_items(self.__api_item_min, self.__api_item_max)
         items = [Item.create_raw(item) for item in raw_items]
 
         return items

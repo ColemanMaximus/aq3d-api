@@ -12,7 +12,7 @@ class Servers(APIUpdater):
     """ A class bundle of related servers, and useful methods. """
 
     def __init__(self,
-                 servers=None,
+                 servers = None,
                  fromapi: bool = False,
                  auto_update_fromapi: bool = False,
                  update_interval: int = 60
@@ -40,7 +40,7 @@ class Servers(APIUpdater):
         """
         Returns all servers within this Servers instance.
 
-        :return tuple: A tuple of server objects.
+        :return tuple: A tuple of Server objects.
         """
 
         if self._auto_update:

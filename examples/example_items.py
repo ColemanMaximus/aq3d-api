@@ -5,16 +5,16 @@ from aq3d_api.enums.item_rarity import ItemRarity
 from aq3d_api.items.containers import Items
 
 
-def get_items(items_index_min: int, items_index_max: int):
+def get_items(min_index: int, max_index: int):
     # Creates an Items instance which creates a bundle of items based on
     # the min and max index ranges.
-    return Items(fromapi=True,
-                 api_items_min=items_index_min,
-                 api_items_max=items_index_max)
+    return Items(fromapi = True,
+                 api_items_min = min_index,
+                 api_items_max = max_index)
 
 
 if __name__ == "__main__":
-    # Create an Items object with item IDs between 300 and 600
+    # Create an Items object with item IDs between 300 and 600.
     items = get_items(300, 600)
 
     # Save items to either a CSV file or JSON file.

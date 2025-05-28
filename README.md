@@ -14,8 +14,14 @@ it's not going to be ideal._
 - **Servers**
   - GET server statistics such as player counts.
   - Capture timestamped server snapshots for logging or charting graphs.
+
 - **Items (Supports Ranges)**
   - Create a container of Item objects and view their data.
+  - Filter items by multiple types:
+    - Item Type
+    - Item Equip Type
+    - Item Attribute Key
+
 - **Maps (Supports Ranges)**
   - Create a container of Map objects and view their data.
 
@@ -31,8 +37,12 @@ Save data CSV and JSON files with a single method either
 - API for more types
   - **NPCs**
   - **Dialogues**
+  - **Dialog Image Generator**
   - **Class Skills**
-  - **Machine Data**
+  - **Spells & Skills**
+  - **Loot Box Items**
+  - **Character Info (Name, Level, Class, Badges)** 
+  - **Daily Map**
 - Filter Items by category.
 - Create a wiki on here to explain how to use the package.
 

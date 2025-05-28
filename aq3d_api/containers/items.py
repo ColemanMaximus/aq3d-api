@@ -69,7 +69,11 @@ class Items(DataContainer, APIUpdater):
             item for item in items if isinstance(item, Item)
         ]
 
-    def items_by_type(self, filter_type: ItemType | ItemEquipType | ItemRarity) -> Generator[Item]:
+    def items_by_type(self,
+                      filter_type: ItemType
+                                   | ItemEquipType
+                                   | ItemRarity
+                       ) -> Generator[Item]:
         """
         Returns a filtered list of items by enum types.
 

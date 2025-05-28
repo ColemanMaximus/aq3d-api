@@ -3,6 +3,7 @@ from pathlib import Path
 from aq3d_api import utils
 from aq3d_api.enums.item_rarity import ItemRarity
 from aq3d_api.containers.items import Items
+from aq3d_api.enums.item_type import ItemType
 
 
 def get_items(min_index: int, max_index: int):
@@ -21,11 +22,14 @@ if __name__ == "__main__":
     items.to_csv(Path("items.csv"))
     items.to_json_file(Path("items.json"))
 
-    # GET all legendary items within the range of items.
+    # All legendary items.
     legendary_items = items.items_by_type(ItemRarity.LEGENDARY)
+
+    # Save all those legendary items to a json file.
+    utils.to_json_file(list(legendary_items), Path("legendary.json"))
 
     # All items which are cosmetic.
     cosmetic_items = items.items_by_keypair("cosmetic", True)
 
-    # Save all those legendary items to a json file.
-    utils.to_json_file(list(legendary_items), Path("legendary.json"))
+    # Maybe all house items.
+    house_items = items.items_by_type(ItemType.HOUSE_ITEM)

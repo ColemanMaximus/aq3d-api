@@ -1,4 +1,8 @@
-""" This module contains the DataContainer class."""
+"""
+This module defines the DataContainer class, which provides a generic container
+for storing and processing collections of objects, with utility methods for
+exporting the contained data to CSV and JSON formats.
+"""
 
 from collections.abc import Generator
 from pathlib import Path
@@ -8,13 +12,16 @@ from aq3d_api import utils
 
 class DataContainer:
     """
-    Acts as a container of objects with useful methods to process those
-    objects.
+    A generic container class for managing and exporting collections of objects.
+
+    Provides methods for adding objects, iterating, and exporting
+    the collection to CSV and JSON files.
     """
 
-    def __init(self, objs):
+    def __init__(self, objs):
         """
-        :param objs: The objects to add to this container.
+        Parameters:
+            objs: List of objects to store in the container.
         """
 
         self.objs = objs
@@ -22,9 +29,10 @@ class DataContainer:
     @property
     def _objs(self) -> Generator:
         """
-        Gets the objects stored within this data container.
+        Returns a generator that yields all objects stored in the container.
 
-        :return: The stored objects.
+        Yields:
+            Generator: Each object contained within the container.
         """
 
         return (obj for obj in self.__objs)
@@ -32,18 +40,24 @@ class DataContainer:
     @_objs.setter
     def _objs(self, objs):
         """
-        Sets the objects for this data container instance.
+        Sets the internal list of objects for the container.
 
-        :param objs: The objects to add to this container.
+        Parameters:
+            objs (Iterable): The collection of objects to be stored in the container.
         """
 
         self.__objs = objs
 
     def add(self, obj, cls):
         """
-        Adds a Server object into the Servers instance.
+        Adds an object to the container if it is an instance of the specified class_
 
-        :param server: The Server object to add into the Servers container.
+        Parameters:
+            obj (Any): The object to be added to the container.
+            cls (type): The class or type that `obj` is expected to be an instance of.
+
+        Raises:
+            ValueError: If `obj` is not an instance of `cls`.
         """
 
         if not isinstance(obj, cls):
@@ -51,17 +65,21 @@ class DataContainer:
                 f"Expected a {type(cls)} object but instead received {type(obj)}."
             )
 
-        if self._objs:
-            objs = list(self._objs)
-            objs.append(obj)
-            self._objs = objs
+        if self.__objs:
+            self.__objs.append(obj)
 
     def to_csv(self, path: Path):
         """
-        Useful method to export all the objects within this data container
-        into a csv file.
+        Export the objects contained in this container to a CSV file.
 
-        :param path: The path to write the objects to.
+        This method serializes the objects stored in the container
+        and writes them to the specified CSV file.
+
+        Args:
+            path (Path): The file path where the CSV will be saved.
+
+        Raises:
+            ValueError: If the provided path is not an instance of pathlib.Path.
         """
 
         if not isinstance(path, Path):
@@ -71,10 +89,13 @@ class DataContainer:
 
     def to_json_file(self, path: Path):
         """
-        Useful method to export all the objects within this data container
-        into a json file.
+        Serializes the container's objects to a JSON file at the specified path.
 
-        :param path: The path to write the objects to.
+        Args:
+            path (Path): The file system path where the JSON file will be written.
+
+        Raises:
+            ValueError: If the provided path is not an instance of pathlib.Path.
         """
 
         if not isinstance(path, Path):

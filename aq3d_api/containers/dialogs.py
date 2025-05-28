@@ -1,4 +1,7 @@
-""" This module contains the Dialogs class. """
+"""
+This module defines the Dialogs container class for managing collections of Dialog objects,
+including support for fetching and updating dialog data from the AQ3D API.
+"""
 
 from collections.abc import Generator
 
@@ -10,7 +13,8 @@ from aq3d_api.dialogs.dialog import Dialog
 
 class Dialogs(DataContainer, APIUpdater):
     """
-    This class wraps a bundle of Dialog objects together.
+    A container class for managing Dialog objects, with optional API integration
+    and auto-update functionality.
     """
 
     def __init__(self,
@@ -22,14 +26,13 @@ class Dialogs(DataContainer, APIUpdater):
                  update_interval: int = 1000):
 
         """
-        :param dialogs: If any dialogs should be added at initialization.
-        :param fromapi: Whether dialogs should be fetched from the API.
-        :param api_dialogs_min: The starting index for fetching dialogs.
-        :param api_dialogs_max: The end index for fetching dialogs.
-        :param auto_update_fromapi: Should the dialogs be updated after
-        the update interval expires.
-        :param update_interval: After how many seconds should fresh dialog
-        data be fetched from the API.
+        Parameters:
+            dialogs (optional): Initial dialogs to populate the container.
+            fromapi (bool): Whether to fetch dialogs from the API.
+            api_dialogs_min (int): Minimum number of dialogs to fetch from the API.
+            api_dialogs_max (int): Maximum number of dialogs to fetch from the API.
+            auto_update_fromapi (bool): Whether to automatically update dialogs from the API.
+            update_interval (int): Interval (in seconds) for automatic updates.
         """
 
         self.dialogs = dialogs
@@ -39,15 +42,17 @@ class Dialogs(DataContainer, APIUpdater):
         if fromapi:
             self.dialogs = self.__fetch_fromapi()
 
-        super().__init__(auto_update_fromapi, update_interval)
+        DataContainer.__init__(self, dialogs)
+        APIUpdater.__init__(self, auto_update_fromapi, update_interval)
 
 
     @property
     def dialogs(self) -> Generator[Dialog]:
         """
-        Gets all the dialogs within this container.
+        Yields the dialogs associated with this container.
 
-        :return: Returns a generator of Dialog objects.
+        Yields:
+            Generator[Dialog]: An iterator over Dialog objects contained within this instance.
         """
 
         return self._objs
@@ -55,9 +60,10 @@ class Dialogs(DataContainer, APIUpdater):
     @dialogs.setter
     def dialogs(self, dialogs = None):
         """
-        Sets the Dialog objects which should be contained within this object.
+        Sets the internal dialogs list after validating each item.
 
-        :param dialogs: The dialogs to be containerized.
+        Parameters:
+            dialogs (list[Dialog]): _description_. A list of Dialog objects to be assigned.
         """
 
         if not dialogs:
@@ -70,9 +76,10 @@ class Dialogs(DataContainer, APIUpdater):
 
     def __fetch_fromapi(self) -> tuple | None:
         """
-        Gets all dialogs from the official AQ3D API.
+        Fetches dialog data from the API and returns it as a tuple of Dialog objects.
 
-        :return tuple: A tuple of dialog objects.
+        Returns:
+            tuple[Dialog]: A tuple containing Dialog objects if dialogs are found,
         """
 
         raw_dialogs = (

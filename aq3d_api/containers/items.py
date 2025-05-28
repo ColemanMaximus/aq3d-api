@@ -1,4 +1,10 @@
-""" This module contains the Items class container. """
+"""
+This module defines the Items container class for managing collections of Item objects.
+
+It provides functionality to filter, update, and fetch items from the official API, supporting
+various item attributes and types.
+"""
+
 from collections.abc import Generator
 
 from aq3d_api.containers.container import DataContainer
@@ -12,8 +18,8 @@ from aq3d_api.api.handler import send_req_items
 
 class Items(DataContainer, APIUpdater):
     """
-    Items container class to bundle items together.
-    Supports the APIUpdater class.
+    A container class for managing and filtering collections of Item objects,
+    with optional support for fetching and auto-updating items from an external API.
     """
 
     def __init__(self,
@@ -22,16 +28,17 @@ class Items(DataContainer, APIUpdater):
                  api_items_min: int = 1,
                  api_items_max: int = 1,
                  auto_update_fromapi: bool = False,
-                 update_interval: int = 60
+                 update_interval: int = 1000
                  ):
 
         """
-        :param items: The items which should be added to the container of initialization.
-        :param fromapi: Should items be fetched from the official API.
-        :param api_items_min: The start index for item IDs to be fetched.
-        :param api_items_max: The end index for item IDs to be fetched.
-        :param auto_update_fromapi: If items data should be refreshed after the update interval.
-        :param update_interval: After how many seconds until new item data should be fetched.
+        Parameters
+            items (optional): Initial list of items.
+            fromapi (bool): Whether to fetch items from the API.
+            api_items_min (int): Minimum number of items to fetch from the API.
+            api_items_max (int): Maximum number of items to fetch from the API.
+            auto_update_fromapi (bool): Whether to automatically update items from the API.
+            update_interval (int): Interval in seconds for automatic updates.
         """
 
         self.items = items
@@ -41,14 +48,17 @@ class Items(DataContainer, APIUpdater):
         if fromapi:
             self.items = self.__fetch_fromapi()
 
-        super().__init__(auto_update_fromapi, update_interval)
+        DataContainer.__init__(self, items)
+        APIUpdater.__init__(self, auto_update_fromapi, update_interval)
 
     @property
     def items(self) -> Generator[Item]:
         """
-        Returns a generator of Item objects within the Items container class.
+        Yields each Item object contained in the container.
 
-        :return: Returns a generator of Item objects.
+
+        Yields:
+            Generator[Item]: Item from the container.
         """
 
         return (item for item in self._objs)
@@ -56,9 +66,11 @@ class Items(DataContainer, APIUpdater):
     @items.setter
     def items(self, items):
         """
-        Sets the items container to a list of Item objects.
+        Sets the internal list of item objects, filtering to include
+        only instances of the `Item` class.
 
-        :param items: The items to supply the container.
+        Parameters:
+            items (list): A list of objects to be filtered and stored.
         """
 
         if not items:
@@ -75,12 +87,16 @@ class Items(DataContainer, APIUpdater):
                                    | ItemRarity
                        ) -> Generator[Item]:
         """
-        Returns a filtered list of items by enum types.
+        Yields items from the container that match the specified filter type.
 
-        Accepts an ItemType, ItemEquipType or ItemRarity types.
+        Depending on the type of `filter_type`, this method filters items by their rarity,
+        equipment type, or item type.
 
-        :param filter_type: The enum type to filter by.
-        :return: Generator of filtered items.
+        Parameters:
+            filter_type (ItemType | ItemEquipType | ItemRarity): The item type to filter by.
+
+        Yields:
+            Generator[Item]: Items from the container that match the specified filter type
         """
 
         if isinstance(filter_type, ItemRarity):
@@ -92,12 +108,19 @@ class Items(DataContainer, APIUpdater):
 
     def items_by_keypair(self, key: str, value) -> Generator[Item]:
         """
-        Returns a filtered list of Item objects if they have
-        the matching key value pair.
+        Yields items from the container whose attribute `key` matches the specified `value`.
 
-        :param key: The key you want to filter by.
-        :param value: The value the key should be to be considered a match.
-        :return: A generator of filtered Item objects.
+        Args:
+            key (str): The name of the attribute to filter items by.
+            value (Any): The value that the item's attribute should match.
+
+        Raises:
+            ValueError: If `key` is not a string.
+            ValueError: If `value` is empty or None.
+
+
+        Yields:
+            Generator[Item]: Items whose attribute `key` equals `value`.
         """
 
         if not isinstance(key, str):
@@ -110,9 +133,11 @@ class Items(DataContainer, APIUpdater):
 
     def __fetch_fromapi(self) -> tuple | None:
         """
-        Requests items to be fetched from the official API.
+        Fetches item data from the API within the specified item ID range
+        and returns a tuple of Item objects.
 
-        :return: The fetched items as a list of Item objects.
+        Returns:
+            tuple: A tuple containing Item instances created from the raw API response
         """
 
         raw_items = send_req_items(self.__api_item_min, self.__api_item_max)

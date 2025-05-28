@@ -1,6 +1,6 @@
 """
-This module contains the classes which supports automatically updating
-locally cached data from the official API.
+This module provides the APIUpdater base class, which manages automatic updating of locally cached data from an external API.
+It defines the interface and logic for checking update intervals and fetching fresh data, intended to be extended by subclasses.
 """
 
 from time import time
@@ -8,15 +8,17 @@ from abc import abstractmethod
 
 class APIUpdater:
     """
-    Used for any directive containers which are configured
-    to update its cached data every update interval in seconds.
+    APIUpdater is a base class for managing periodic updates of cached data from an API.
+    It provides logic to determine when data needs refreshing based on a configurable interval,
+    and defines an interface for fetching new data from the API.
+    Subclasses should implement the __fetch_fromapi method with specific retrieval logic.
     """
 
     def __init__(self, auto_update_fromapi: bool, update_interval: int):
-        """
-        :param auto_update_fromapi: Should the auto update pull from the API.
-        :param update_interval: How long in seconds until fresh data
-        has to be pulled from the API.
+        """"
+        Parameters:
+            auto_update_fromapi (bool): If True, enables automatic updates from the API.
+            update_interval (int): The interval in seconds between update checks.
         """
 
         self._auto_update = auto_update_fromapi
@@ -26,10 +28,11 @@ class APIUpdater:
     @property
     def __needs_updating(self) -> bool:
         """
-        Checks whether the last updated time has expired based on
-        the update interval.
+        Checks if the updater needs to perform an update based on the elapsed
+        time since the last update.
 
-        :return: A bool if new data needs to be fetched.
+        Returns:
+            bool: If the time since the last update exceeds the update interval.
         """
 
         if (time() - self._last_updated) < self._update_interval:
@@ -39,10 +42,10 @@ class APIUpdater:
 
     def _update_fromapi(self) -> tuple | None:
         """
-        Calls the fetch method on the directives to retrieve fresh
-        data from the API.
+        Fetches and updates data from the API if an update is needed.
 
-        :return: The retrieved data from the API.
+        Returns:
+            tuple: The data fetched from the API as a tuple.
         """
 
         if not self.__needs_updating:
@@ -54,10 +57,14 @@ class APIUpdater:
     @abstractmethod
     def __fetch_fromapi(self) -> tuple | None:
         """
-        The method which controls how to fetch data from the API.
+        Fetches data from the API.
 
-        All directives should implement this and have
-        its own logic.
+        Returns:
+            tuple: A tuple containing the fetched data.
+
+        Notes:
+            Subclasses should implement this method and their own retrieval logic.
         """
+
 
         pass

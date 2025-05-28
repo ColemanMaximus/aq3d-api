@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from aq3d_api.containers.servers import Servers
 
 

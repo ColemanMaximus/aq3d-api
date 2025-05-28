@@ -120,7 +120,7 @@ class Map:
     def max_players(self) -> int:
         """
         Gets the amount of players allowed within this map.
-        
+
         :return: The max players for the map.
         """
 
@@ -130,10 +130,10 @@ class Map:
     def max_players(self, max_players: int):
         """
         Sets the maximum amount of players this map can have.
-        
+
         :param max_players: The maximum players for this map.
         """
-        
+
         if not isinstance(max_players, int) or max_players < 1:
             raise ValueError(
                 "Expected a positive integer for the max players property setter."

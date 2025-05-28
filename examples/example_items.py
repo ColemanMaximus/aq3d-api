@@ -1,3 +1,6 @@
+import sys
+sys.path.append(".")
+
 from pathlib import Path
 
 from aq3d_api import utils

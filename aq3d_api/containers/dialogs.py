@@ -14,7 +14,7 @@ class Dialogs(DataContainer, APIUpdater):
     """
 
     def __init__(self,
-                 dialogs: list[Dialog] = None,
+                 dialogs = None,
                  fromapi: bool = False,
                  api_dialogs_min: int = 1,
                  api_dialogs_max: int = 1,

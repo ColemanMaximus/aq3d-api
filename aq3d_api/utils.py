@@ -9,6 +9,9 @@ from json import JSONDecodeError
 from pathlib import Path
 from enum import Enum
 
+from aq3d_api.dialogs.actor import DialogActor
+from aq3d_api.dialogs.frame import DialogFrame
+
 
 class EnumEncoder(json.JSONEncoder):
     """
@@ -19,6 +22,12 @@ class EnumEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Enum):
             return o.name
+
+        if isinstance(o, DialogFrame):
+            return o.to_dict()
+
+        if isinstance(o, DialogActor):
+            return o.to_dict()
 
         return None
 

@@ -108,7 +108,7 @@ class Items(DataContainer, APIUpdater):
 
         return (item for item in self.items if item.__getattribute__(key))
 
-    def __fetch_fromapi(self) -> list | None:
+    def __fetch_fromapi(self) -> tuple | None:
         """
         Requests items to be fetched from the official API.
 
@@ -116,6 +116,4 @@ class Items(DataContainer, APIUpdater):
         """
 
         raw_items = send_req_items(self.__api_item_min, self.__api_item_max)
-        items = [Item.create_raw(item) for item in raw_items]
-
-        return items
+        return tuple(Item.create_raw(item) for item in raw_items)

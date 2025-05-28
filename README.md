@@ -21,9 +21,15 @@ it's not going to be ideal._
     - Item Type
     - Item Equip Type
     - Item Attribute Key
+    - Item Rarity
 
 - **Maps (Supports Ranges)**
   - Create a container of Map objects and view their data.
+  - Filter maps by map attribute keys.
+
+- **Dialogs (Supports Ranges)**
+  - Create a container of Dialog objects and view their data.
+  - View individual frames and actors of each Dialog.
 
 
 Save data CSV and JSON files with a single method either
@@ -36,7 +42,6 @@ Save data CSV and JSON files with a single method either
 - Refactor all HTTP requests to use async for non-blocking operations.
 - API for more types
   - **NPCs**
-  - **Dialogues**
   - **Dialog Image Generator**
   - **Class Skills**
   - **Spells & Skills**

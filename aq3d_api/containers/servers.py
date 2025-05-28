@@ -75,21 +75,6 @@ class Servers(DataContainer, APIUpdater):
 
         return (server for server in self.servers if server.is_online)
 
-    def add(self, server: Server):
-        """
-        Adds a Server object into the Servers instance.
-
-        :param server: The Server object to add into the Servers container.
-        """
-
-        if not isinstance(server, Server):
-            raise ValueError(f"Expected a Server object but instead received {type(server)}.")
-
-        if self.servers:
-            servers = list(self._objs)
-            servers.append(server)
-            self.servers = servers
-
     @property
     def total_players(self) -> int:
         """

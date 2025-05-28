@@ -16,7 +16,7 @@ class Item(ItemAttributes):
                  level: int = 1,
                  description: str = "",
                  price: int = 0,
-                 item_type: ItemType = ItemType.NONE,
+                 item_type: ItemType = ItemType.ITEM,
                  equip_type: ItemEquipType = ItemEquipType.NONE,
                  rarity: ItemRarity = ItemRarity.JUNK,
                  stack_size: int = 1,
@@ -340,7 +340,7 @@ class Item(ItemAttributes):
             description=raw.get("Desc", ""),
             price=raw.get("Cost", 0),
             item_type=utils.to_enum(
-                ItemType, raw.get("Type", 0), ItemType.NONE
+                ItemType, raw.get("Type", 0), ItemType.ITEM
             ),
             equip_type=utils.to_enum(
                 ItemEquipType, raw.get("EquipSlot", 0), ItemEquipType.NONE

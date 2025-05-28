@@ -4,7 +4,7 @@ such as sending requests for servers and items.
 """
 
 from requests import request, JSONDecodeError
-from aq3d_api.enums.urls import APIURLS
+from aq3d_api.api.endpoints import Endpoints
 
 
 def send_api_req(endpoint: str, method: str = "GET", params: dict = None) -> dict | None:
@@ -35,7 +35,7 @@ def send_req_servers() -> dict:
     :return: Returns the servers as a dict object.
     """
 
-    return send_api_req(APIURLS.GET_SERVERS.value[0])
+    return send_api_req(Endpoints.GET_SERVERS.value[0])
 
 
 def send_req_range(url: str,
@@ -107,8 +107,8 @@ def send_req_items(min_index: int = 1,
     :return: Returns a dict object of item data from JSON form.
     """
 
-    url = APIURLS.GET_ITEMS.value[0]
-    param_key = APIURLS.GET_ITEMS.value[1]
+    url = Endpoints.GET_ITEMS.value[0]
+    param_key = Endpoints.GET_ITEMS.value[1]
 
     return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)
 
@@ -127,7 +127,7 @@ def send_req_maps(min_index: int = 1,
     :return: Returns a dict object of map data from JSON form.
     """
 
-    url = APIURLS.GET_MAPS.value[0]
-    param_key = APIURLS.GET_MAPS.value[1]
+    url = Endpoints.GET_MAPS.value[0]
+    param_key = Endpoints.GET_MAPS.value[1]
 
     return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)

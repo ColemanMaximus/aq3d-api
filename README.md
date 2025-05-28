@@ -33,6 +33,7 @@ Save data CSV and JSON files with a single method either
   - **Dialogues**
   - **Class Skills**
   - **Machine Data**
+- Filter Items by category.
 - Create a wiki on here to explain how to use the package.
 
 ---

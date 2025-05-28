@@ -54,39 +54,44 @@ def send_req_range(url: str,
     :return: The result of the range of requests.
     """
 
-    index_range_diff = max_index - min_index
-    reqs_needed = (
-        (index_range_diff // bulk_max),
+    difference = (max_index + 1) - min_index
+    index_range_difference = difference if difference > 0 else 1
+
+    requests_needed = (
+        (index_range_difference // bulk_max),
         # The remainder of items remaining, used for
         # last second requests.
-        (index_range_diff % bulk_max)
+        (index_range_difference % bulk_max)
     )
 
-    max_iteration = reqs_needed[0]
-    if reqs_needed[-1] > 0:
+    max_iteration = requests_needed[0]
+    if requests_needed[-1] > 0:
         max_iteration += 1
 
     indices = []
-    for req_num in range(1, max_iteration + 1):
-        start_index = (bulk_max * (req_num - 1)) + 1 \
-            if req_num > 1 else 1
+    for req_index in range(1, max_iteration + 1):
+        start_index = (bulk_max * (req_index - 1)) + 1 \
+            if req_index > 1 else 1
 
-        # We should begin the start index at the min value
+        # We should begin the start index at the min value - 1
         # if the min value is above 1.
         if min_index > 1:
-            start_index += min_index
+            start_index += min_index - 1
 
-        end_index = (start_index + bulk_max)
-        if req_num >= max_iteration:
-            end_index = (start_index + reqs_needed[-1])
+        end_index = (start_index + (bulk_max if bulk_max > 1 else 0))
+        if req_index >= max_iteration:
+            end_index = (start_index + requests_needed[-1])
 
         params = {param_key: [
-            key_id for key_id in range(start_index, end_index)
+            key_id for key_id in range(
+                start_index, (end_index + 1)
+                if end_index > 1 else 2
+            )
         ]}
 
         response = send_api_req(url, method, params)
         if isinstance(response, dict):
-            indices += [indice[-1] for indice in response.items()]
+            indices += [response]
             continue
 
         indices += send_api_req(url, method, params)
@@ -131,3 +136,25 @@ def send_req_maps(min_index: int = 1,
     param_key = Endpoints.GET_MAPS.value[1]
 
     return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)
+
+def send_req_dialogs(min_index: int = 1,
+                   max_index: int = 1,
+                   bulk_max: int = 1) -> list:
+
+    """
+    Sends a request to the API to fetch a range of dialogs
+    from their IDs.
+
+    :param min_index: The start index for dialog IDs.
+    :param max_index: The end index for dialog IDs.
+    :param bulk_max: How many IDs there can be within each bulk request.
+    :return: Returns a dict object of dialog data from JSON form.
+    """
+
+    url = Endpoints.GET_DIALOGS.value[0]
+    param_key = Endpoints.GET_DIALOGS.value[1]
+
+    raw_dialogs = (
+        send_req_range(url, "GET", param_key, min_index, max_index, bulk_max)
+    )
+    return [dialog for dialog in raw_dialogs if dialog.get("ID", -1) > 0]

@@ -72,7 +72,7 @@ from aq3d_api.containers.items import Items
 from aq3d_api.enums.item_rarity import ItemRarity
 from aq3d_api import utils
 
-# Fetch items with IDs 300-600 from the API
+# Fetch items with IDs 1-150 from the API
 items = Items({
     "min-index": 1,
     "max-index": 150,

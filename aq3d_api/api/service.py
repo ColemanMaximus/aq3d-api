@@ -75,6 +75,12 @@ class APIService:
 
         self._last_updated = time()
         self.__inital_update = True
+
+        # Some data from the API comes back as dict object rather than a list.
+        # In this case make the values of that dict the list objects.
+        if isinstance(raw_objects, dict):
+            raw_objects = list(raw_objects.values())
+
         objects = [cls.create_raw(obj) for obj in raw_objects]
 
         # We need to overwrite the containers objects

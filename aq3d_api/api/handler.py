@@ -137,7 +137,8 @@ def send_req_maps(min_index: int = 1,
     url = Endpoints.GET_MAPS.value[0]
     param_key = Endpoints.GET_MAPS.value[1]
 
-    return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)
+    # We return index 0 because maps are structured as a dict rather than a list of dicts.
+    return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)[0]
 
 def send_req_dialogs(min_index: int = 1,
                    max_index: int = 1,

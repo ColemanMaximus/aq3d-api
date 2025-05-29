@@ -85,7 +85,7 @@ class APIService:
 
         # We need to overwrite the containers objects
         # to avoid duplication.
-        container.append(cls, objects, True)
+        container.append(cls, True, objects)
 
     @abstractmethod
     def _fetch(self) -> tuple:

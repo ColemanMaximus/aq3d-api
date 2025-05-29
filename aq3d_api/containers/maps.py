@@ -72,7 +72,7 @@ class Maps(DataContainer, APIService):
 
     def _fetch(self) -> tuple:
         """
-        Returns a tuple containing the current container, the send_req_maps function,
+        Returns a tuple containing the current container, the Handlers.MAPS handler,
         and the Map class.
         """
 

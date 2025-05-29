@@ -43,7 +43,7 @@ class DataContainer:
 
         self.__objs = objs
 
-    def append(self, cls: type, *objs, overwrite = False):
+    def append(self, cls: type, overwrite = False, *objs):
         """
         Appends objects to the container if they are an instance
         of the specified class.
@@ -57,6 +57,7 @@ class DataContainer:
 
         if overwrite:
             self.__objs = [obj for obj in objs[0] if isinstance(obj, cls)]
+            return
 
         # *objs returns a tuple with the list of items inside
         # so we have to unpack the tuple first.

@@ -1,86 +1,75 @@
-""" This module contains then Servers container class. """
+"""
+This module defines the Servers class, which manages a collection of AQ3D server objects.
+It provides methods and properties to access, filter, sort, and snapshot server data,
+as well as aggregate statistics such as total online players.
+"""
+
 from collections.abc import Generator
 from requests import JSONDecodeError
 
-from aq3d_api.api.updater import APIUpdater
+from aq3d_api.api.handlers.types import Handlers
+from aq3d_api.api.service import APIService
 from aq3d_api.containers.container import DataContainer
 from aq3d_api.servers.server import Server
 from aq3d_api.snapshots.server import ServerSnapshot
-from aq3d_api.api.handler import send_req_servers
 
-class Servers(DataContainer, APIUpdater):
-    """ A class bundle of related servers, and useful methods. """
+class Servers(DataContainer, APIService):
+    """
+    A container for managing AQ3D server objects.
 
-    def __init__(self,
-                 servers = None,
-                 fromapi: bool = False,
-                 auto_update_fromapi: bool = False,
-                 update_interval: int = 60
-                 ):
+    The Servers class provides methods and properties to access, filter, sort,
+    and snapshot server data, as well as retrieve player statistics across all servers.
+    """
+
+    def __init__(self, options: dict = {}):
         """
-        :param servers: Any Server objects to be added at initialization.
-        :param fromapi: If true, the constructor will gather all servers
-        from the official AQ3D API.
-        :param auto_update_fromapi: If true, any time the servers property
-        is called, it'll check to see if it needs refreshing based on the update
-        interval class attribute.
-        :param update_interval: How often should the auto update interval
-        be in seconds.
+        ### Parameters:
+            **auto-update (bool)**: Whether to automatically servers maps from the API.
+            **update-interval (int)**: Interval (in seconds) for automatic updates.
 
+        ### Example
+        ```
+        {
+            "auto-update": True,
+            "update-interval": 60
+        }
+        ```
         """
 
-        self.servers = servers
-        if fromapi:
-            self.servers = list(self.__fetch_fromapi())
-
-        super().__init__(auto_update_fromapi, update_interval)
+        DataContainer.__init__(self)
+        APIService.__init__(self, options)
 
     @property
-    def servers(self) -> Generator[Server]:
+    def servers(self) -> list[Server]:
         """
-        Returns all servers within this Servers instance.
+        Returns a list of Server objects after updating the internal state.
 
-        :return: Generator of Server objects.
-        """
-
-        if self._auto_update:
-            self._update_fromapi()
-
-        return self._objs
-
-    @servers.setter
-    def servers(self, servers=None):
-        """
-        Sets the servers attribute to an initial sequence of servers.
-
-        :param servers: The servers to add to this Servers instance.
+        ### Returns
+            **list[Server]**: A List of Server instances from the container.
         """
 
-        if not servers:
-            self._objs = servers
-            return
-
-        self._objs = [
-            server for server in servers if isinstance(server, Server)
-        ]
+        self.update()
+        return list(self._objs)
 
     @property
-    def online_servers(self) -> Generator:
+    def online_servers(self) -> list[Server]:
         """
-        Gets all servers are on online, filtering offline
-        and maintenance servers.
+        Returns a list of servers that are currently online.
 
-        :return: Returns a generator of online servers.
+        ### Returns:
+            **list[Server]**: A list of Server instances that are online.
         """
 
-        return (server for server in self.servers if server.is_online)
+        return [server for server in self.servers if server.is_online]
 
     @property
     def total_players(self) -> int:
         """
-        Returns the number of online players across all servers.
+        Returns a total number of players currently online
+        across all servers.
 
-        :return int: The number of online players.
+        ### Returns:
+            **int**: Total number of players online across all servers.
         """
 
         if not self.servers:
@@ -88,66 +77,75 @@ class Servers(DataContainer, APIUpdater):
 
         return sum([server.players for server in self.servers])
 
-    def sorted_servers(self, reverse: bool = True, online: bool = False) -> Generator[Server] | None:
+    def sorted_servers(self, reverse: bool = True, online: bool = False) -> list[Server]:
         """
-        Returns a sorted tuple of servers by player counts.
+        Returns a list of Server objects sorted by the number of players.
 
-        :param reverse: If the sorted servers should be reversed.
-        :param online: If the servers should only include online servers.
-        :return: Returns a sorted tuple of servers, otherwise None.
+        ### Parameters:
+            **reverse (bool, optional)**: Sorts the servers in descending order by player counts.
+            **online (bool, optional)**: Only includes servers that are currently online.
+
+        ### Returns:
+            **list[Server]**: A list of Server objects sorted by the number of players.
         """
 
-        return (server for server in
-            sorted(
-                self.servers if not online else self.online_servers,
-                key=lambda server: server.players,
-                reverse=reverse
-            )
-        )
+        return [server for server in
+                sorted(
+                    self.servers if not online else self.online_servers,
+                    key=lambda server: server.players,
+                    reverse=reverse
+                )
+        ]
 
     @property
     def highest_population(self) -> Server | None:
         """
-        Returns the server which has the most online players.
+        Returns the server with the highest population among online servers.
 
-        :return: The server with the most players online.
+        ### Returns
+            **Server**: The online server with the highest population.
+
         """
 
         if not self.servers:
             return None
 
-        return list(self.sorted_servers(online=True))[0]
+        try:
+            return list(self.sorted_servers(online=True))[0]
+        except IndexError:
+            return None
 
     def create_snapshots(self, online_only: bool = True) -> Generator[ServerSnapshot]:
         """
-        Generates a snapshot of each server assigned to this instance.
+        Creates snapshots of the current servers.
 
-        :param online_only: Whether to only snapshot online servers or both.
-        :return: Tuple of sever snapshots.
+        Snapshots can be used for analytical purcposes to save server stats
+        with timestamps.
+
+        ### Parameters:
+            **online_only (bool, optional)**: Only include servers that are currently online.
+
+        ### Yields:
+            **Generator[ServerSnapshot]**: A snapshot object representing the state of each server.
         """
 
         snapshots = (
             ServerSnapshot(server)
-             for server in self.sorted_servers(online=online_only)
+            for server in self.sorted_servers(online=online_only)
         )
         return snapshots
 
-    def __fetch_fromapi(self) -> tuple | None:
+    def _fetch(self) -> tuple:
         """
-        Gets all servers from the official AQ3D API.
-
-        :return tuple: A tuple of Server objects.
+        Returns a tuple containing the current container, the Handlers.SERVERS handler,
+        and the Server class.
         """
 
-        try:
-            raw_servers = send_req_servers()["Servers"]
-            return tuple(Server.create_raw(raw_server) for raw_server in raw_servers)
-        except JSONDecodeError:
-            raise ValueError("Invalid JSON was received from the api.")
+        return tuple([self, Handlers.SERVERS, Server]) # type: ignore
 
     def __str__(self):
         response = \
-            f"Servers ({len(list(self.servers))}): Players -> {self.total_players}"
+            f"Servers ({len(self.servers)}): Players -> {self.total_players}"
 
         for server in self.servers:
             response += f"\n  - {server}"

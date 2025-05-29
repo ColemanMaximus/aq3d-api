@@ -73,14 +73,19 @@ from aq3d_api.enums.item_rarity import ItemRarity
 from aq3d_api import utils
 
 # Fetch items with IDs 300-600 from the API
-items = Items(fromapi=True, api_items_min=300, api_items_max=600)
+items = Items({
+    "min-index": 1,
+    "max-index": 150,
+    "auto-update": True,
+    "update-interval": 1000 # 1000 Seconds
+})
 
 # Export all items to CSV and JSON
 items.to_csv(Path("items.csv"))
 items.to_json_file(Path("items.json"))
 
 # Filter for legendary items and export to JSON
-legendary_items = items.items_by_type(ItemRarity.LEGENDARY)
+legendary_items = items.by_type(ItemRarity.LEGENDARY)
 utils.to_json_file(list(legendary_items), Path("legendary.json"))
 ```
 
@@ -88,7 +93,10 @@ utils.to_json_file(list(legendary_items), Path("legendary.json"))
 ```python
 from aq3d_api.containers.servers import Servers
 
-servers = Servers(fromapi=True, auto_update_fromapi=True, update_interval=60)
+servers = Servers({
+    "auto-update": True,
+    "update-interval": 60 # 60 Seconds
+})
 server_snapshots = servers.create_snapshots()
 ```
 

@@ -341,7 +341,7 @@ class Server:
         """
 
         return cls(
-            sid = raw.get("ID", -1),
+            id = raw.get("ID", -1),
             name = raw.get("Name", ""),
             region = raw.get("Region", "NA"),
             language = raw.get("Language", "en"),

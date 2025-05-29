@@ -9,16 +9,16 @@ class DialogFrame:
     containing the speaker, title of the speaker, and the text.
     """
 
-    def __init__(self, speaker: str, title: str, text: str):
+    def __init__(self, **data):
         """
         :param speaker: The speaker of the dialog frame.
         :param title: The title of the speaker.
         :param text: The text within this dialog frame.
         """
 
-        self.speaker = speaker
-        self.title = title
-        self.text = text
+        self.speaker = data["speaker"]
+        self.title = data["title"]
+        self.text = data["text"]
 
     @property
     def speaker(self) -> str:

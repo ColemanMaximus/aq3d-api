@@ -13,19 +13,16 @@ class Dialog:
     individual dialog frames and actors.
     """
 
-    def __init__(self,
-                 id: int,
-                 frames: Sequence[DialogFrame],
-                 actors: Sequence[DialogActor]):
+    def __init__(self, **data):
         """
         :param id: The ID of the dialog.
         :param frames: The frames which this dialog has.
         :param actors: The actors or NPCs which are within this dialog.
         """
 
-        self.id = id
-        self.frames = frames
-        self.actors = actors
+        self.id = data["id"]
+        self.frames = data["frames"]
+        self.actors = data["actors"]
 
     @property
     def id(self) -> int:
@@ -124,7 +121,7 @@ class Dialog:
                   if raw_actor.get("NPCID")]
 
         return cls(
-            id = raw.get("ID"),
+            id = raw.get("ID", -1),
             frames = frames,
             actors = actors
         )

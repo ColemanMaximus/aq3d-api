@@ -1,4 +1,4 @@
-from aq3d_api.api.endpoints import Endpoints
+from aq3d_api.enums.endpoints import Endpoints
 from aq3d_api.api.requests import req_range
 
 def get_dialogs(min_index: int = 1,

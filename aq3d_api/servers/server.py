@@ -10,19 +10,7 @@ class Server:
 
     maintenance_buffer = 10
 
-    def __init__(self,
-                 sid: int,
-                 name: str,
-                 region: str = "NA",
-                 language: str = "en",
-                 players: int = 0,
-                 max_players: int = 0,
-                 hostname: str = "",
-                 port: int = 0,
-                 access_level: int = 0,
-                 status: ServerStatus = ServerStatus.OFFLINE,
-                 last_updated: float = -1
-                 ):
+    def __init__(self, **data):
         """
 
         :param sid: ID of the server.
@@ -37,17 +25,17 @@ class Server:
         :param status: The server uptime indicator, ONLINE, OFFLINE AND MAINTENANCE.
         """
 
-        self.id = sid
-        self.name = name
-        self.region = region
-        self.language = language
-        self.players = players
-        self.max_players = max_players
-        self.hostname = hostname
-        self.port = port
-        self.access_level = access_level
-        self.status = status
-        self.last_updated = last_updated
+        self.id = data["id"]
+        self.name = data["name"]
+        self.region = data["region"]
+        self.language = data["language"]
+        self.players = data["players"]
+        self.max_players = data["max_players"]
+        self.hostname = data["hostname"]
+        self.port = data["port"]
+        self.access_level = data["access_level"]
+        self.status = data["status"]
+        self.last_updated = data["last_updated"]
 
     @property
     def id(self) -> int:
@@ -353,8 +341,8 @@ class Server:
         """
 
         return cls(
-            sid = raw.get("ID"),
-            name = raw.get("Name"),
+            sid = raw.get("ID", -1),
+            name = raw.get("Name", ""),
             region = raw.get("Region", "NA"),
             language = raw.get("Language", "en"),
             players = raw.get("UserCount", 0),

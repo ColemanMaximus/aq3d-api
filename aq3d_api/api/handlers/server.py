@@ -1,4 +1,4 @@
-from aq3d_api.api.endpoints import Endpoints
+from aq3d_api.enums.endpoints import Endpoints
 from aq3d_api.api.requests import api_req
 
 def get_servers(*args) -> dict:

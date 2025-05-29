@@ -8,19 +8,7 @@ class Map:
     a Map class.
     """
 
-    def __init__(self,
-                 id: int,
-                 name: str,
-                 description: str = "",
-                 max_players: int = 1,
-                 min_level: int = 1,
-                 level_restriction: int = 0,
-                 scaled: bool = False,
-                 seasonal: bool = False,
-                 dungeon: bool = False,
-                 challenge: bool = False,
-                 active: bool = False
-                 ):
+    def __init__(self, **data):
         """
         :param id: The ID of the map.
         :param name: Name of the map.
@@ -35,17 +23,17 @@ class Map:
         :param active: Whether the map is active, or instance joinable.
         """
 
-        self.id = id
-        self.name = name
-        self.description = description
-        self.max_players = max_players
-        self.min_level = min_level
-        self.level_restriction = level_restriction
-        self.scaled = scaled
-        self.seasonal = seasonal
-        self.dungeon = dungeon
-        self.challenge = challenge
-        self.active = active
+        self.id = data["id"]
+        self.name = data["name"]
+        self.description = data["description"]
+        self.max_players = data["max_players"]
+        self.min_level = data["min_level"]
+        self.level_restriction = data["level_restriction"]
+        self.scaled = data["scaled"]
+        self.seasonal = data["seasonal"]
+        self.dungeon = data["dungeon"]
+        self.challenge = data["challenge"]
+        self.active = data["active"]
 
     @property
     def id(self) -> int:
@@ -322,8 +310,8 @@ class Map:
 
         map = raw["map"]
         return cls(
-            id = map.get("ID"),
-            name = map.get("DisplayName"),
+            id = map.get("ID", -1),
+            name = map.get("DisplayName", ""),
             description = map.get("Description", ""),
             max_players = map.get("MaxUsers", 1),
             min_level = map.get("MinLevel", 1),

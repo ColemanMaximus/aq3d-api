@@ -10,28 +10,8 @@ from aq3d_api.enums.item_rarity import ItemRarity
 class Item(ItemAttributes):
     """ The Item class defines an item object. """
 
-    def __init__(self,
-                 item_id: int,
-                 name: str,
-                 level: int = 1,
-                 description: str = "",
-                 price: int = 0,
-                 item_type: ItemType = ItemType.ITEM,
-                 equip_type: ItemEquipType = ItemEquipType.NONE,
-                 rarity: ItemRarity = ItemRarity.JUNK,
-                 stack_size: int = 1,
-                 version: int = 1,
-                 health: float = 0,
-                 attack: float = 0,
-                 armor: float = 0,
-                 evasion: float = 0,
-                 critical: float = 0,
-                 is_cosmetic: bool = False,
-                 is_dc_purchasable: bool = False
-                 ):
-
+    def __init__(self, **data):
         """
-
         :param item_id: ID of the item.
         :param name: Name of the item.
         :param level: Level of the item.
@@ -51,19 +31,19 @@ class Item(ItemAttributes):
         :param is_dc_purchasable: If the item can be purchased using Dragon Crystals.
         """
 
-        self.id = item_id
-        self.name = name
-        self.level = level
-        self.description = description
-        self.price = price
-        self.type = item_type
-        self.equip_type = equip_type
-        self.rarity = rarity
-        self.stack_size = stack_size
-        self.version = version
-        self.cosmetic = is_cosmetic
-        self.dc_purchasable = is_dc_purchasable
-        super().__init__(health, attack, armor, evasion, critical)
+        self.id = data["id"]
+        self.name = data["name"]
+        self.level = data["level"]
+        self.description = data["description"]
+        self.price = data["price"]
+        self.type = data["type"]
+        self.equip_type = data["equip_type"]
+        self.rarity = data["rarity"]
+        self.stack_size = data["stack_size"]
+        self.version = data["version"]
+        self.cosmetic = data["is_cosmetic"]
+        self.dc_purchasable = data["dc_purchasable"]
+        super().__init__(**data)
 
     @property
     def id(self) -> int:
@@ -334,8 +314,8 @@ class Item(ItemAttributes):
         """
 
         return cls(
-            item_id=raw.get("ID"),
-            name=raw.get("Name"),
+            item_id=raw.get("ID", -1),
+            name=raw.get("Name", ""),
             level=raw.get("Level", 1),
             description=raw.get("Desc", ""),
             price=raw.get("Cost", 0),

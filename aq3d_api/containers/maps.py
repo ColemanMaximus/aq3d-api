@@ -45,7 +45,7 @@ class Maps(DataContainer, APIService):
         self.update()
         return list(self._objs)
 
-    def maps_by_keypair(self, key: str, value) -> Generator[Map]:
+    def by_keypair(self, key: str, value) -> Generator[Map]:
         """
         Yields all Map objects where the specified attribute (key) exists.
 

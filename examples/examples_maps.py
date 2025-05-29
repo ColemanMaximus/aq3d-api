@@ -17,7 +17,7 @@ def get_maps(min_index: int = 1, max_index: int = 1, bulk_max: int = 200):
 
 
 if __name__ == "__main__":
-    # Create a Maps object with map IDs between 1 and 300.
+    # Create a Maps object with map IDs between 1 and 50.
     maps = get_maps(1, 50)
     # Update the maps container at least once to gather the API data.
     maps.update()
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     maps.to_json_file(Path("./examples/maps.json"))
 
     # All items which are cosmetic.
-    dungeons = maps.maps_by_keypair("dungeon", True)
+    dungeons = maps.by_keypair("dungeon", True)
 
     # Save all those dungeons to a json file.
     utils.to_json_file(list(dungeons), Path("dungeons.json"))

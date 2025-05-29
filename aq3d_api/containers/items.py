@@ -13,7 +13,7 @@ from aq3d_api.enums.item_type import ItemType
 from aq3d_api.enums.item_equip_type import ItemEquipType
 from aq3d_api.enums.item_rarity import ItemRarity
 from aq3d_api.api.service import APIService
-from aq3d_api.api.handler import send_req_items
+from aq3d_api.api.handlers.types import Handlers
 
 
 class Items(DataContainer, APIService):
@@ -113,7 +113,7 @@ class Items(DataContainer, APIService):
         and returns a tuple of Item objects.
         """
 
-        return tuple([self, send_req_items, Item])
+        return tuple([self, Handlers.ITEMS, Item]) # type: ignore
 
     def __getitem__(self, index: int) -> Item:
         return self.items[index]

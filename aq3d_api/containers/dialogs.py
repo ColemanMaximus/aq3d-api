@@ -5,7 +5,7 @@ including support for fetching and updating dialog data from the AQ3D API.
 
 from collections.abc import Generator
 
-from aq3d_api.api.handler import send_req_dialogs
+from aq3d_api.api.handlers.types import Handlers
 from aq3d_api.api.service import APIService
 from aq3d_api.containers.container import DataContainer
 from aq3d_api.dialogs.dialog import Dialog
@@ -64,7 +64,7 @@ class Dialogs(DataContainer, APIService):
             **tuple**: A tuple of the form (self, send_req_dialogs, Dialog)
         """
 
-        return tuple([self, send_req_dialogs, Dialog])
+        return tuple([self, Handlers.DIALOGS, Dialog]) # type: ignore
 
     def __getitem__(self, index: int) -> Dialog:
         return self.dialogs[index]

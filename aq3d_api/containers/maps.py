@@ -5,7 +5,7 @@ It includes functionality to fetch map data from the AQ3D API, and filter maps b
 
 from collections.abc import Generator
 
-from aq3d_api.api.handler import send_req_maps
+from aq3d_api.api.handlers.types import Handlers
 from aq3d_api.api.service import APIService
 from aq3d_api.containers.container import DataContainer
 from aq3d_api.maps.map import Map
@@ -76,7 +76,7 @@ class Maps(DataContainer, APIService):
         and the Map class.
         """
 
-        return tuple([self, send_req_maps, Map])
+        return tuple([self, Handlers.MAPS, Map]) # type: ignore
 
     def __getitem__(self, index: int) -> Map:
         return self.maps[index]

@@ -4,10 +4,8 @@ such as sending requests for servers and items.
 """
 
 from requests import request, JSONDecodeError
-from aq3d_api.api.endpoints import Endpoints
 
-
-def send_api_req(endpoint: str, method: str = "GET", params: dict = None) -> dict | None:
+def api_req(endpoint: str, method: str = "GET", params: dict = None) -> dict | None:
     """
     Send an API request to an endpoint with custom
     method and params.
@@ -28,17 +26,7 @@ def send_api_req(endpoint: str, method: str = "GET", params: dict = None) -> dic
         return None
 
 
-def send_req_servers() -> dict:
-    """
-    Sends a request to fetch all servers from the official API.
-
-    :return: Returns the servers as a dict object.
-    """
-
-    return send_api_req(Endpoints.GET_SERVERS.value[0])
-
-
-def send_req_range(url: str,
+def req_range(url: str,
                    method: str = "GET",
                    param_key: str = "",
                    min_index: int = 1,
@@ -89,7 +77,7 @@ def send_req_range(url: str,
             )
         ]}
 
-        response = send_api_req(url, method, params)
+        response = api_req(url, method, params)
         if isinstance(response, dict):
             indices.append(response)
             continue
@@ -98,67 +86,3 @@ def send_req_range(url: str,
             indices += response
 
     return indices
-
-
-def send_req_items(min_index: int = 1,
-                   max_index: int = 1,
-                   bulk_max: int = 200) -> list:
-
-    """
-    Sends a request to the API to fetch a range of items
-    from their IDs.
-
-    :param min_index: The start index for item IDs.
-    :param max_index: The end index for item IDs.
-    :param bulk_max: How many IDs there can be within each bulk request.
-    :return: Returns a dict object of item data from JSON form.
-    """
-
-    url = Endpoints.GET_ITEMS.value[0]
-    param_key = Endpoints.GET_ITEMS.value[1]
-
-    return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)
-
-
-def send_req_maps(min_index: int = 1,
-                   max_index: int = 1,
-                   bulk_max: int = 200) -> list:
-
-    """
-    Sends a request to the API to fetch a range of maps
-    from their IDs.
-
-    :param min_index: The start index for map IDs.
-    :param max_index: The end index for map IDs.
-    :param bulk_max: How many IDs there can be within each bulk request.
-    :return: Returns a dict object of map data from JSON form.
-    """
-
-    url = Endpoints.GET_MAPS.value[0]
-    param_key = Endpoints.GET_MAPS.value[1]
-
-    # We return index 0 because maps are structured as a dict rather than a list of dicts.
-    return send_req_range(url, "POST", param_key, min_index, max_index, bulk_max)[0]
-
-def send_req_dialogs(min_index: int = 1,
-                   max_index: int = 1,
-                   bulk_max: int = 1) -> list:
-
-    """
-    Sends a request to the API to fetch a range of dialogs
-    from their IDs.
-
-    :param min_index: The start index for dialog IDs.
-    :param max_index: The end index for dialog IDs.
-    :param bulk_max: How many IDs there can be within each bulk request.
-    :return: Returns a dict object of dialog data from JSON form.
-    """
-
-    url = Endpoints.GET_DIALOGS.value[0]
-    param_key = Endpoints.GET_DIALOGS.value[1]
-
-    raw_dialogs = (
-        send_req_range(url, "GET", param_key, min_index, max_index, bulk_max)
-    )
-
-    return [dialog for dialog in raw_dialogs if dialog.get("ID", -1) > 0]

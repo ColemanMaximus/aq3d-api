@@ -33,9 +33,10 @@ class Maps(DataContainer, APIUpdater):
         self.__api_maps_max = api_maps_max
 
         if fromapi:
-            self.maps = list(self.__fetch_fromapi())
+            self.maps = self.__fetch_fromapi()
 
-        super().__init__(auto_update_fromapi, update_interval)
+        DataContainer.__init__(self, maps)
+        APIUpdater.__init__(self, auto_update_fromapi, update_interval)
 
     @property
     def maps(self) -> Generator[Map]:

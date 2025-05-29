@@ -1,9 +1,6 @@
 # AQ3D API Wrapper for Python
 
----
-This is a package for Python which aims to
-have complete practical coverage of the AQ3D API.
-Developed with OOP principles in mind for easy extensibility.
+A Python package providing a comprehensive, object-oriented interface to the AdventureQuest 3D (AQ3D) game API. This library allows you to fetch, filter, and manage data for servers, items, maps, and dialogs from AQ3D.
 
 _This package is under development which means it's not in a usable state.
 Technically you can use it, but without future implementation of async processes,
@@ -12,32 +9,30 @@ it's not going to be ideal._
 ### API Coverage
 
 - **Servers**
-  - GET server statistics such as player counts.
-  - Capture timestamped server snapshots for logging or charting graphs.
+  - Retrieve server statistics (player counts, status, etc.)
+  - Capture timestamped server snapshots for logging or analytics.
 
 - **Items (Supports Ranges)**
-  - Create a container of Item objects and view their data.
-  - Filter items by multiple types:
-    - Item Type
-    - Item Equip Type
-    - Item Attribute Key
-    - Item Rarity
+  - Fetch items by ID range from the API
+  - Filter items by type, equip type, rarity, or attribute key
 
 - **Maps (Supports Ranges)**
-  - Create a container of Map objects and view their data.
-  - Filter maps by map attribute keys.
+  - Fetch maps/dungeons by ID range
+  - Filter maps by attribute key
 
 - **Dialogs (Supports Ranges)**
-  - Create a container of Dialog objects and view their data.
-  - View individual frames and actors of each Dialog.
+  - Fetch dialogs by ID range
+  - Access dialog frames and actors (NPCs)
+
+- **Auto-Update Support**
+  - Containers can auto-refresh their data from the API at configurable intervals
 
 
 Save data CSV and JSON files with a single method either
 `to_csv(Path)` or `to_json_file(Path)` on the container objects.
 
----
 
-### TODOs
+## TODOs
 
 - Refactor all HTTP requests to use async for non-blocking operations.
 - API for more types
@@ -46,19 +41,59 @@ Save data CSV and JSON files with a single method either
   - **Class Skills**
   - **Spells & Skills**
   - **Loot Box Items**
-  - **Character Info (Name, Level, Class, Badges)** 
+  - **Character Info (Name, Level, Class, Badges)**
   - **Daily Map**
 - Filter Items by category.
 - Create a wiki on here to explain how to use the package.
 
+
+## How To Use
+
+### Installation
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/ColemanMaximus/aq3d-api.git
+    cd aq3d-api
+    ```
+
+2. Install dependencies:
+    Using Pipenv:
+    ```sh
+    pipenv install
+    ```
+
+### Example Usages
+
+#### Example: Fetching and Exporting Items
+```python
+from pathlib import Path
+from aq3d_api.containers.items import Items
+from aq3d_api.enums.item_rarity import ItemRarity
+from aq3d_api import utils
+
+# Fetch items with IDs 300-600 from the API
+items = Items(fromapi=True, api_items_min=300, api_items_max=600)
+
+# Export all items to CSV and JSON
+items.to_csv(Path("items.csv"))
+items.to_json_file(Path("items.json"))
+
+# Filter for legendary items and export to JSON
+legendary_items = items.items_by_type(ItemRarity.LEGENDARY)
+utils.to_json_file(list(legendary_items), Path("legendary.json"))
+```
+
+#### Example: Fetching server data and creating snapshots of all servers.
+```python
+from aq3d_api.containers.servers import Servers
+
+servers = Servers(fromapi=True, auto_update_fromapi=True, update_interval=60)
+server_snapshots = servers.create_snapshots()
+```
+
 ---
 
-### How To Use
-
-- **Coming Soon**
-
----
-
-_This project was intended for learning purposes, and for
-a way to easily interface with AQ3D's API endpoints. Please use fairly, 
-and within the terms and conditions by Artix Entertainment themselves._
+_This project is intended for learning and research purposes.
+Please use fairly and respect the terms and conditions of
+Artix Entertainment._

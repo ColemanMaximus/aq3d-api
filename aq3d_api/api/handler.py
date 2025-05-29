@@ -91,10 +91,12 @@ def send_req_range(url: str,
 
         response = send_api_req(url, method, params)
         if isinstance(response, dict):
-            indices += [response]
+            indices.append(response)
             continue
 
-        indices += send_api_req(url, method, params)
+        if isinstance(response, list):
+            indices += response
+
     return indices
 
 
@@ -157,4 +159,5 @@ def send_req_dialogs(min_index: int = 1,
     raw_dialogs = (
         send_req_range(url, "GET", param_key, min_index, max_index, bulk_max)
     )
+
     return [dialog for dialog in raw_dialogs if dialog.get("ID", -1) > 0]

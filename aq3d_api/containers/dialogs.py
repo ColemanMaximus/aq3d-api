@@ -20,17 +20,17 @@ class Dialogs(DataContainer, APIService):
     def __init__(self, options: dict = {}):
         """
         ### Parameters:
-            **auto_update (bool)**: Whether to automatically update dialogs from the API.
-            **min_index (int)**: Minimum number of dialogs by ID range.
-            **max_index (int)**: Maximum number of dialogs by ID range.
-            **update_interval (int)**: Interval (in seconds) for automatic updates.
+            **auto-update (bool)**: Whether to automatically update dialogs from the API.
+            **min-index (int)**: Minimum number of dialogs by ID range.
+            **max-index (int)**: Maximum number of dialogs by ID range.
+            **update-interval (int)**: Interval (in seconds) for automatic updates.
 
         ### Example
         ```
         {
             "auto-update": True,
             "min-index": 1,
-            "max_index": 10,
+            "max-index": 10,
             "update-interval": 1000
         }
         ```
@@ -64,7 +64,7 @@ class Dialogs(DataContainer, APIService):
             **tuple**: A tuple of the form (self, send_req_dialogs, Dialog)
         """
 
-        return tuple((self, send_req_dialogs, Dialog))
+        return tuple([self, send_req_dialogs, Dialog])
 
     def __getitem__(self, index: int) -> Dialog:
         return self.dialogs[index]

@@ -17,10 +17,10 @@ class APIService:
     def __init__(self, options: dict = {}):
         """
         ### Parameters:
-            **auto_update (bool)**: Whether to automatically update dialogs from the API.
-            **min_index (int)**: Minimum number of dialogs by ID range.
-            **max_index (int)**: Maximum number of dialogs by ID range.
-            **update_interval (int)**: Interval (in seconds) for automatic updates.
+            **auto-update (bool)**: Whether to automatically update dialogs from the API.
+            **min-index (int)**: Minimum number of dialogs by ID range.
+            **max-index (int)**: Maximum number of dialogs by ID range.
+            **update-interval (int)**: Interval (in seconds) for automatic updates.
         """
 
         self._auto_update = options.get("auto-update", False)

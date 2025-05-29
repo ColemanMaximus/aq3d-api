@@ -1,4 +1,7 @@
-""" This module contains the the Dialog class."""
+"""
+This module defines the Dialog class, which encapsulates dialog data such
+as dialog frames and actors (NPCs) for AQ3D dialogs.
+"""
 
 from collections.abc import Sequence
 
@@ -9,15 +12,25 @@ from aq3d_api.dialogs.frame import DialogFrame
 
 class Dialog:
     """
-    The Dialog class groups together related dialog data such as
-    individual dialog frames and actors.
+    Represents a dialog sequence in AQ3D, containing dialog frames
+    and actors (NPCs).
     """
 
     def __init__(self, **data):
         """
-        :param id: The ID of the dialog.
-        :param frames: The frames which this dialog has.
-        :param actors: The actors or NPCs which are within this dialog.
+        ### Parameters:
+            **id (int)**: The id of the dialog.
+            **frames (list[DialogFrame])**: A list of dialog frames belonging to this dialog.
+            **actors (list[DialogActor])**: The dialog actors (NPCs) which are in this dialog.
+
+        ### Example
+        ```
+        {
+            "id": 1
+            "frames": [DialogFrame, DialogFrame],
+            "actors": [DialogActor]
+        }
+        ```
         """
 
         self.id = data["id"]
@@ -27,9 +40,10 @@ class Dialog:
     @property
     def id(self) -> int:
         """
-        Gets the id of the dialog.
+        Returns the unique id associated with this dialog instance.
 
-        :return: Returns the dialog id.
+        ### Returns:
+            **int**: The unique ID of the dialog.
         """
 
         return self.__id
@@ -37,9 +51,13 @@ class Dialog:
     @id.setter
     def id(self, id: int):
         """
-        Sets the id of the dialog.
+        Sets the dialog ID.
 
-        :param id: The id of the dialog.
+        ### Parameters:
+            **id (int)**: The unique id for the dialog.
+
+        ### Raises:
+            **ValueError**: If the provided id is not an integer.
         """
 
         if not isinstance(id, int):
@@ -50,10 +68,10 @@ class Dialog:
     @property
     def frames(self) -> tuple[DialogFrame, ...]:
         """
-        Gets all the frames within this dialog. Each frame being a collection
-        of speaker, and text data.
+        Returns a tuple containing all dialog frames associated with this dialog.
 
-        :return: The frames of this dialog.
+        ### Returns:
+            **tuple[DialogFrame]**: DialogFrame objects representing the frames of the dialog.
         """
 
         return self.__frames
@@ -61,9 +79,14 @@ class Dialog:
     @frames.setter
     def frames(self, frames: Sequence[DialogFrame]):
         """
-        Sets all the frames this dialog has.
+        Sets the dialog frames for this dialog.
 
-        :param frames: The frames for this dialog.
+        ### Parameters:
+            **frames (Sequence[DialogFrame])**: A sequence of DialogFrame objects to be set for the dialog.
+
+        ### Notes:
+            - Only instances of DialogFrame are retained; other types are ignored.
+            - If the provided sequence is empty or None, no changes are made.
         """
 
         if not frames:
@@ -76,10 +99,11 @@ class Dialog:
     @property
     def actors(self) -> tuple[DialogActor, ...]:
         """
-        Gets all the dialog actor objects, which is essentially the NPCs
-        within this dialog sequence.
+        Returns a tuple containing all dialog actors associated
+        with this dialog.
 
-        :return: The actors within this dialog.
+        ### Returns:
+            **tuple[DialogActor]**: DialogActor objects of the dialog.
         """
 
         return self.__actors
@@ -87,9 +111,14 @@ class Dialog:
     @actors.setter
     def actors(self, actors: Sequence[DialogActor]):
         """
-        Sets the actors (NPCs) who appear within this dialog sequence.
+        Sets the dialog actors for this dialog.
 
-        :param actors: The actors within this dialog.
+        ### Parameters:
+            **actors (Sequence[DialogActor])**: A sequence of DialogActor objects to be set for the dialog.
+
+        ### Notes:
+            - Only instances of DialogActor are retained; other types are ignored.
+            - If the provided sequence is empty or None, no changes are made.
         """
 
         if not actors:
@@ -102,11 +131,19 @@ class Dialog:
     @classmethod
     def create_raw(cls, raw: dict):
         """
-        Factory method to create a Dialog instance based on raw object given
-        from the official AQ3D API.
+        Factory method to create an instance of the class from a raw dictionary.
 
-        :param raw: The raw dialog object from the API.
-        :return: The new created instance of a Dialog class.
+        ### Parameters:
+            **raw (dict)**: A dictionary containing dialog data. Expected keys include
+                - **ID (int)**: The dialog identifier.
+                - **FrameCollection (list)**: A list of frame dictionaries to be converted into DialogFrame instances.
+                - **Characters (list)**: A list of character dictionaries to be converted into DialogActor instances.
+
+        ### Returns:
+            **Dialog**: An instance of the class initialized with the provided data.
+
+        ### Raises:
+            **ValueError**: If the provided raw argument is not a dictionary.
         """
 
         if not isinstance(raw, dict):
@@ -128,9 +165,10 @@ class Dialog:
 
     def to_dict(self) -> dict:
         """
-        Converts this class into a dict object.
+        Converts the current instance into a dictionary representation.
 
-        :return: Returns the dict representation of this object.
+        ### Returns:
+            **dict**: A dictionary containing all the attributes of the instance.
         """
 
         return utils.to_dict(self)

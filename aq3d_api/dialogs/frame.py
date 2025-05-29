@@ -1,19 +1,32 @@
-""" This module contains the DialogFrame class. """
+"""
+This module defines the DialogFrame class, which represents a single frame
+within a dialog in the AQ3D API context.
+"""
 
 from aq3d_api import utils
 
 
 class DialogFrame:
     """
-    A DialogFrame class is a representation of frame within a dialog,
-    containing the speaker, title of the speaker, and the text.
+    A DialogFrame encapsulates information about the speaker,
+    their title, and the dialog text.
     """
 
     def __init__(self, **data):
         """
-        :param speaker: The speaker of the dialog frame.
-        :param title: The title of the speaker.
-        :param text: The text within this dialog frame.
+        ### Parameters:
+            **speaker (str)**: The speaker of the text.
+            **title (str)**: The title of the speaker.
+            **text (str)**: The text which is spoken by the speaker.
+
+        ### Example
+        ```
+        {
+            "speaker": "John"
+            "title": "The Bold",
+            "text": "Welcome to this land."
+        }
+        ```
         """
 
         self.speaker = data["speaker"]
@@ -23,9 +36,10 @@ class DialogFrame:
     @property
     def speaker(self) -> str:
         """
-        Gets the speaker in this dialog frame.
+        Returns the name of the current speaker.
 
-        :return: Returns the dialog frame speaker.
+        ### Returns:
+            **str**: The name of the speaker.
         """
 
         return self.__speaker
@@ -33,9 +47,14 @@ class DialogFrame:
     @speaker.setter
     def speaker(self, speaker: str):
         """
-        Sets the dialog frame speaker.
+        Sets the name of the speaker for the dialog frame.
 
-        :param speaker: The speaker for this dialog frame.
+        ### Parameters:
+            **speaker (str)**: The name of the speaker.
+
+        ### Raises:
+            **ValueError**: If the provided speaker is not a string.
+
         """
 
         if not isinstance(speaker, str):
@@ -48,9 +67,11 @@ class DialogFrame:
     @property
     def title(self) -> str:
         """
-        Gets the title of the speaker in this dialog frame.
+        Gets the title of the dialog speaker.
 
-        :return: The title of the speaker for this dialog frame.
+        ### Returns:
+            **str**: The title of the dialog speaker.
+
         """
 
         return self.__title
@@ -58,9 +79,13 @@ class DialogFrame:
     @title.setter
     def title(self, title: str):
         """
-        Sets the speakers title within the dialog frame.
+        Sets the title of the dialog speaker.
 
-        :param title: The title the speaker should have.
+        ### Parameters:
+            **title (str)**: The title to set for the dialog speaker.
+
+        ### Raises:
+            **ValueError**: If the provided title is not a string.
         """
 
         if not isinstance(title, str):
@@ -73,9 +98,10 @@ class DialogFrame:
     @property
     def text(self) -> str:
         """
-        Gets the dialog frames text.
+        Returns the text content of the dialog frame.
 
-        :return: Returns the dialog frames text.
+        ### Returns:
+            **str**: The text associated with this dialog frame.
         """
 
         return self.__text
@@ -83,9 +109,13 @@ class DialogFrame:
     @text.setter
     def text(self, text: str):
         """
-        Sets the text within this dialog frame
+        Sets the text for the dialog frame.
 
-        :param text: The text to use within this dialog frame.
+        ### Parameters:
+            **text (str)**: The text to display in the dialog frame.
+
+        ### Raises:
+            **ValueError**: If the provided text is not a string.
         """
 
         if not isinstance(text, str):
@@ -95,9 +125,10 @@ class DialogFrame:
 
     def to_dict(self) -> dict:
         """
-        Converts this object into a dict representation.
+        Converts the current instance into a dictionary representation.
 
-        :return: A dict representation of this object.
+        ### Returns:
+            **dict**: A dictionary containing all the attributes of the instance.
         """
 
         return utils.to_dict(self)
@@ -105,11 +136,20 @@ class DialogFrame:
     @classmethod
     def create_raw(cls, raw: dict):
         """
-        Factory method to create an instance of this class using raw dialog frame
-        object from the official AQ3D API.
+        Factory method to create an instance of the class from a raw dictionary.
 
-        :param raw: The raw object to use to create a DialogFrame instance.
-        :return: The new created instance of the DialogFrame class.
+        ### Parameters:
+            **raw (dict)**: A dictionary containing dialogue data with possible keys:
+                - **DialogueName**: The name of the speaker.
+                - **DialogueTitle**: The title of the speaker.
+                - **DialogueText**: The main text of the dialogue.
+
+        ### Returns:
+            **DialogFrame**: An instance of the class initialized with the
+            provided dialogue data.
+
+        ### Raises:
+            **ValueError**: If the provided raw argument is not a dictionary.
         """
 
         if not isinstance(raw, dict):

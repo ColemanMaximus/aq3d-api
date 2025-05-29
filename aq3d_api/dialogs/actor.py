@@ -1,38 +1,45 @@
-""" This module contains the DialogActor class. """
+"""
+This module defines the DialogActor class, which represents an NPC actor
+within a dialog in the AQ3D API.
+"""
 
 from aq3d_api import utils
 
 
 class DialogActor:
     """
-    A DialogActor class is a representation of an NPC which appears within
-    a dialog.
+    Represents a dialog actor (NPC) in the AQ3D API.
     """
 
-    def __init__(self,
-                 npc_id: int):
+    def __init__(self, npc_id: int):
         """
-        :param npc_id: The ID of the NPC.
+        ### Parameters:
+            **npc_id (int)**: The unique id of the NPC associated with this actor.
         """
 
         self.npc_id = npc_id
-    
+
     @property
     def npc_id(self) -> int:
         """
-        Gets the NPC ID of the dialog actor.
+        Returns the unique id of the NPC associated with this actor.
 
-        :return: The NPC ID of the actor.
+        ### Returns:
+            **int**: The NPC's unique identifier.
         """
 
         return self.__npc_id
-    
+
     @npc_id.setter
     def npc_id(self, npc_id: int):
         """
-        Sets the NPC ID of the dialog actor.
+        Sets the NPC (Non-Player Character) ID for the dialog actor.
 
-        :param npc_id: The NPC ID of the actor.
+        ### Parameters:
+            **npc_id (int)**: The unique id of the NPC.
+
+        ### Raises:
+            **ValueError**: If npc id is not an integer.
         """
 
         if not isinstance(npc_id, int):
@@ -42,9 +49,10 @@ class DialogActor:
 
     def to_dict(self) -> dict:
         """
-        Converts this object into a dict representation.
+        Converts the current instance into a dictionary representation.
 
-        :return: A dict representation of this object.
+        ### Returns:
+            **dict**: A dictionary containing all the attributes of the instance.
         """
 
         return utils.to_dict(self)
@@ -52,11 +60,16 @@ class DialogActor:
     @classmethod
     def create_raw(cls, raw: dict):
         """
-        Factory method to create an instance of this class using raw dialog actor
-        object from the official AQ3D API.
+        Factory method to create an instance of the class from a raw dictionary.
 
-        :param raw: The raw object to use to create a DialogActor instance.
-        :return: The new created instance of the DialogActor class.
+        ### Parameters:
+            **raw (dict)**: A dictionary containing the data to initialize the instance.
+
+        ### Returns:
+            DialogActor: New instance of the DialogActor.
+
+        ### Raises:
+            **ValueError**: If the provided raw argument is not a dictionary.
         """
 
         if not isinstance(raw, dict):
@@ -64,8 +77,4 @@ class DialogActor:
                 "Expected a dict object for using the factory method."
             )
 
-        npc_id = raw.get("NPCID")
-        if npc_id:
-            return cls(npc_id = npc_id)
-
-        return None
+        return cls(raw.get("NPCID", -1))
